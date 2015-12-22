@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import User
 
 # Create your models here.                      pas d'ajout pattern et pas d'ajout de categorie
 
@@ -24,6 +25,7 @@ class Clothes(models.Model):
     nbreUse = models.PositiveIntegerField()
     categorie = models.ForeignKey('Categories')
     theme = models.ManyToManyField('Themes')
+    user = models.ForeignKey('User')
    # pattern = models.OneToManyField('Pattern')
 
     '''pour limiter les patterns a 3 ne pas oublier une methode du genre:
@@ -51,7 +53,7 @@ class Themes(models.Model):
 
 class Pattern(models.Model):   #lier to color              +       couleur joker       + champs bool joker
     name = models.CharField(max_length=30)
-    clothe = models.ForeignKey(Clothes)
+    #clothe = models.ForeignKey(Clothes)
     ''' on y accède avec un Clothes object c comme ça :
     c.pattern_set.objects.all() '''
     color = models.ManyToManyField(Color)
@@ -60,3 +62,11 @@ class Pattern(models.Model):   #lier to color              +       couleur joker
         
     def __str__(self):
         return self.name
+
+class Parameters(models.Model):
+    user = models.OneToOneField('User')
+    weatherEnabled = models.BooleanField()
+    chilliness = models.PositiveIntegerField()
+            
+    def __str__(self):
+        return self.user.username
