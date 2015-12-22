@@ -1,20 +1,20 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-# Create your models here.
+# Create your models here.                      pas d'ajout pattern et pas d'ajout de categorie
 
 class Categories(models.Model):
     name = models.CharField(max_length=30)
     warmth = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(3)])
-    area = models.CharField(max_length=20)
+    area = models.CharField(max_length=30)  #table a part mais tjrs char
     
     def __str__(self):
         return self.name
 
 
 class Clothes(models.Model):
-    color = models.CharField(max_length=7)
-    warmth = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(3)])
+    color = models.CharField(max_length=7) #table a part
+    warmth = models.PositiveIntegerField()
     photo = models.ImageField()
     state = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(2)])
     nbreUse = models.PositiveIntegerField()
@@ -40,7 +40,7 @@ class Themes(models.Model):
         return self.name
 
 
-class Pattern(models.Model):
+class Pattern(models.Model):   #lier to color              +       couleur joker       + champs bool joker
     name = models.CharField(max_length=30)
     clothe = models.ForeignKey(Clothes)
     ''' on y accède avec un Clothes object c comme ça :
