@@ -36,11 +36,11 @@ def deconnexion(request):
     logout(request)
     return redirect(reverse(connexion))
 
-from django.contrib.auth.decorators import login_required
+'''from django.contrib.auth.decorators import login_required
 
 @login_required
 def dire_bonjour(request):
     if request.user.is_authenticated():
         return HttpResponse("Salut, {0} !".format(request.user.username))
-    return HttpResponse("Salut, anonyme.")
+    return HttpResponse("Salut, anonyme.")'''
 

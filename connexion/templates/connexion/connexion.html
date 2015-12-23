@@ -5,7 +5,7 @@
 {% endif %}
 
 {% if user.is_authenticated %}
-Vous êtes connecté, {{ user.username }} !<p><a href="{% url "blog.views.accueil" %}">Continuer vers l'accueil</a></p>
+Vous êtes connecté, {{ user.username }} !<p><a href="{% url "gestionDressing.views.accueil" %}">Continuer vers l'accueil</a></p>
 {% else %}
 <form method="post" action=".">
     {% csrf_token %}
