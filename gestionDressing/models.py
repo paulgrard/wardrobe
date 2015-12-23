@@ -25,7 +25,7 @@ class Clothes(models.Model):
     nbreUse = models.PositiveIntegerField()
     categorie = models.ForeignKey('Categories')
     theme = models.ManyToManyField('Themes')
-    user = models.ForeignKey('User')
+    user = models.ForeignKey(User)
    # pattern = models.OneToManyField('Pattern')
 
     '''pour limiter les patterns a 3 ne pas oublier une methode du genre:
@@ -64,7 +64,7 @@ class Pattern(models.Model):   #lier to color              +       couleur joker
         return self.name
 
 class Parameters(models.Model):
-    user = models.OneToOneField('User')
+    user = models.OneToOneField(User)
     weatherEnabled = models.BooleanField()
     chilliness = models.PositiveIntegerField()
             
