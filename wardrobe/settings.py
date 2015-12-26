@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'gestionDressing',
     'connexion',
+    'userManage',
 )
 
 MIDDLEWARE_CLASSES = (

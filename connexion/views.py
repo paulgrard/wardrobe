@@ -10,9 +10,9 @@ from django.contrib.auth import authenticate, login
 import json
 
 def connexion(request):
-    error = False
-    connected = False
-
+    #error = False
+    connected = None
+    data = []
     if request.method == "POST":
         form = ConnexionForm(request.POST)
         if form.is_valid():
@@ -23,12 +23,14 @@ def connexion(request):
                 login(request, user)  # nous connectons l'utilisateur
                 connected = True
             else: # sinon une erreur sera affichée
-                error = True
+                #error = True
+                connected = False
+         data = {'connected':connected}
     else:
         form = ConnexionForm()
 
-    #return render(request, 'connexion/connexion.html', locals())
-    data = {'connected':connected}
+    return render(request, 'connexion/connexion.html', locals())
+   
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
