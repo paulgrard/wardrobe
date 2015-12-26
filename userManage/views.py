@@ -7,7 +7,7 @@ import json
 # Create your views here.
 
 def add(request):
-    new_user = None
+    data = []
     if request.method == "POST":
         form = AddForm(request.POST)
         if form.is_valid():
@@ -19,11 +19,12 @@ def add(request):
 
             user = User.objects.create_user(new_username, new_mail, new_password)
             
+            data = {'new_user':user.username}
     else:
         form = AddForm()
 
-    data = {'new_user':new_user}
-    return render(request, 'userManage/add.html', locals())
+    
+    #return render(request, 'userManage/add.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 #def delete(request):

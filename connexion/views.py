@@ -25,11 +25,11 @@ def connexion(request):
             else: # sinon une erreur sera affichée
                 #error = True
                 connected = False
-         data = {'connected':connected}
+            data = {'connected':connected}
     else:
         form = ConnexionForm()
 
-    return render(request, 'connexion/connexion.html', locals())
+    #return render(request, 'connexion/connexion.html', locals())
    
     return HttpResponse(json.dumps(data), content_type='application/json')
 
