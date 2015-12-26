@@ -3,6 +3,6 @@ from . import views
 
 urlpatterns = patterns('userManage.views',
     url(r'^add$', 'add', name='add'),
-    #url(r'^delete$', 'delete', name='delete'),
+    url(r'^deactivate$', 'deactivate', name='deactivate'),
 )
 
