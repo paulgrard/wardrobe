@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gestionDressing',
+    'dressingManage',
     'connection',
     'userManage',
 )
@@ -104,4 +104,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGIN_URL = '/connexion/'
+LOGIN_URL = '/connection/'

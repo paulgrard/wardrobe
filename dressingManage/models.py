@@ -5,10 +5,10 @@ from django.contrib.auth.models import User
 # Create your models here.                      pas d'ajout pattern et pas d'ajout de categorie
 
 class Categories(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.PositiveIntegerField()   # passer en int?    old = max_length=30
     warmth = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(3)])
     
-    def __str__(self):
+    def __int__(self):
         return self.name
 
 class Area(models.Model):
@@ -24,8 +24,9 @@ class Clothes(models.Model):
     state = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(2)])
     nbreUse = models.PositiveIntegerField()
     categorie = models.ForeignKey('Categories')
-    theme = models.ManyToManyField('Themes')
+    theme = models.ManyToManyField('Themes', blank=True)
     user = models.ForeignKey(User)
+    color = models.ManyToManyField('Color')
    # pattern = models.OneToManyField('Pattern')
 
     '''pour limiter les patterns a 3 ne pas oublier une methode du genre:
@@ -46,6 +47,7 @@ class Color(models.Model):
 
 class Themes(models.Model):
     name = models.CharField(max_length=30)
+    userOwner = models.ForeignKey(User)
     
     def __str__(self):
         return self.name
