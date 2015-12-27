@@ -25,7 +25,7 @@ def add(request):
     else:
         form = AddForm()
 
-    #return render(request, 'userManage/add.html', locals())
+    return render(request, 'userManage/add.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
