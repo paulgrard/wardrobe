@@ -13,6 +13,7 @@ def accueil(request):
 #penser à renommer les photos et faire une requete avant d'ajouter la photo pour savoir si elle est unique ou non
 #plus voir au niveau BDD le coup de area dans categorie
 #pour l'instant on ne peut passer qu'un theme et qu'une couleur
+#vérifier si la couleur existe déja et les contraindre à 3 couleurs maxi
 def addClothe(request):
     data = []
     themes = []
@@ -61,4 +62,20 @@ def addClothe(request):
         
 
     #return render(request, 'dressingManage/addClothe.html', locals())
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def getAllClothes(request):
+    data = []
+    clothes = []
+    photos = []
+    currentUser = request.user
+    if currentUser:
+        clothesFromUser = Clothe.objects.filter(user = currentUser)
+        for clothe in clothesFromUser:
+            photos.append(clothe.photo)
+        data = {'clothes':photos}
+    else:
+        data = {'new_clothe':'User is not authenticate'}
+        
     return HttpResponse(json.dumps(data), content_type='application/json')
