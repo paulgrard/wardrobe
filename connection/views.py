@@ -13,6 +13,7 @@ def connection(request):
     #error = False
     connected = None
     data = []
+    
     if request.method == "POST":
         form = ConnectionForm(request.POST)
         if form.is_valid():
@@ -29,9 +30,12 @@ def connection(request):
         else:
             error = True
     else:
+        if request.user.is_authenticated():
+            data = {'connected':'User already connected'}
+            return HttpResponse(json.dumps(data), content_type='application/json')
         form = ConnectionForm()
 
-    return render(request, 'connection/connection.html', locals())
+    #return render(request, 'connection/connection.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
