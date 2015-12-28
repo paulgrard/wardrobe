@@ -5,7 +5,7 @@
 {% endif %}
 
 {% if user.is_authenticated and user.is_active%}
-Vous êtes connecté, {{ user.username }} !<p><a href="{% url "gestionDressing.views.accueil" %}">Continuer vers l'accueil</a></p>
+Vous êtes connecté, {{ user.username }} !<p><a href="{% url "dressingManage.views.accueil" %}">Continuer vers l'accueil</a></p>
 {% else %}
 <form method="post" action=".">
     {% csrf_token %}

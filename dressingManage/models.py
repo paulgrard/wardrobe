@@ -4,28 +4,29 @@ from django.contrib.auth.models import User
 
 # Create your models here.                      pas d'ajout pattern et pas d'ajout de categorie
 
-class Categories(models.Model):
-    name = models.CharField(max_length=30)
+class Categorie(models.Model):
+    name = models.PositiveIntegerField()   # passer en int?    old = max_length=30
     warmth = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(3)])
-    
+    area = models.PositiveIntegerField()
     def __str__(self):
-        return self.name
+        return str(self.name)
 
-class Area(models.Model):
+'''class Area(models.Model):
     area = models.CharField(max_length=30)
-    
+    #categ = models.ForeignKey('Categorie')
     def __str__(self):
-        return self.area
+        return self.area'''
     
 
-class Clothes(models.Model):
+class Clothe(models.Model):
     warmth = models.PositiveIntegerField()
-    photo = models.ImageField()
+    photo = models.CharField(max_length=30)
     state = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(2)])
     nbreUse = models.PositiveIntegerField()
-    categorie = models.ForeignKey('Categories')
-    theme = models.ManyToManyField('Themes')
+    categorie = models.ForeignKey('Categorie')
+    themes = models.ManyToManyField('Theme', blank=True)
     user = models.ForeignKey(User)
+    colors = models.ManyToManyField('Color')#models.ManyToManyField('Color')
    # pattern = models.OneToManyField('Pattern')
 
     '''pour limiter les patterns a 3 ne pas oublier une methode du genre:
@@ -44,8 +45,9 @@ class Color(models.Model):
     def __str__(self):
         return self.color
 
-class Themes(models.Model):
+class Theme(models.Model):
     name = models.CharField(max_length=30)
+    userOwner = models.ForeignKey(User)
     
     def __str__(self):
         return self.name
@@ -63,7 +65,7 @@ class Pattern(models.Model):   #lier to color              +       couleur joker
     def __str__(self):
         return self.name
 
-class Parameters(models.Model):
+class Parameter(models.Model):
     user = models.OneToOneField(User)
     weatherEnabled = models.BooleanField()
     chilliness = models.PositiveIntegerField()
