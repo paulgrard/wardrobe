@@ -26,7 +26,7 @@ class Clothe(models.Model):
     categorie = models.ForeignKey('Categorie')
     themes = models.ManyToManyField('Theme', blank=True)
     user = models.ForeignKey(User)
-    colors = models.ManyToManyField('Color')
+    colors = models.ManyToManyField('Color')#models.ManyToManyField('Color')
    # pattern = models.OneToManyField('Pattern')
 
     '''pour limiter les patterns a 3 ne pas oublier une methode du genre:

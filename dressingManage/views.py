@@ -24,12 +24,22 @@ def addClothe(request):
 
             if request.user:
                 currentUser = request.user
-                newClothe = Clothe.objects.create(warmth = warmthC, photo = photoC, state = 0, nbreUse = 0, categorie = categorieC, user = currentUser)
+                newClothe = Clothe(warmth = warmthC, photo = photoC, state = 0, nbreUse = 0, categorie = categorieC, user = currentUser)
                 if themesC:
                     newClothe.themes.add(themesC)
+                newClothe.save()
                 #for valColor in colorsC:
-                col = Color.objects.create(color = str(colorsC))#color = valColor
+                col = Color(color = colorsC)#color = valColor
+                col.save()
                 newClothe.colors.add(col)
+                newClothe.save()
+                yolo=newClothe.colors.all()
+                for x in yolo:
+                    yolo2 = x.color
+                
+               
+                data = {'new_clothe':yolo2}
+                return HttpResponse(json.dumps(data), content_type='application/json')
                 
                 if newClothe:
                     data = {'new_clothe':newClothe.photo}
