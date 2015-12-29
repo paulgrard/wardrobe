@@ -12,8 +12,9 @@ def accueil(request):
 
 #penser à renommer les photos et faire une requete avant d'ajouter la photo pour savoir si elle est unique ou non
 #plus voir au niveau BDD le coup de area dans categorie
-#pour l'instant on ne peut passer qu'un theme et qu'une couleur
+#pour l'instant on ne peut pas passer de theme et qu'une couleur
 #vérifier si la couleur existe déja et les contraindre à 3 couleurs maxi
+#couleur joker
 def addClothe(request):
     data = []
     themes = []
@@ -76,6 +77,24 @@ def getAllClothes(request):
             photos.append(clothe.photo)
         data = {'clothes':photos}
     else:
-        data = {'new_clothe':'User is not authenticate'}
+        data = {'clothe':'User is not authenticate'}
         
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+#faire un form pour passer string
+def createTheme(request):
+    '''data = []
+    li1 = []
+    li2 = []
+    li1.append('wesh')
+    li1.append('yolo')
+
+    data = {'Phrase_swag':li1}
+
+    li2.append('Yo')
+    li2.append('Maggle')
+
+    data['Jean']=li2'''
+    
+
     return HttpResponse(json.dumps(data), content_type='application/json')

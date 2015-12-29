@@ -17,7 +17,7 @@ class Categorie(models.Model):
     def __str__(self):
         return self.area'''
     
-
+# mettre une limite pour warmth
 class Clothe(models.Model):
     warmth = models.PositiveIntegerField()
     photo = models.CharField(max_length=30)
