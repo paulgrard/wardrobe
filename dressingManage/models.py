@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.                      pas d'ajout pattern et pas d'ajout de categorie
 
-class Categorie(models.Model):
+class Category(models.Model):
     name = models.PositiveIntegerField()   # passer en int?    old = max_length=30
     warmth = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(3)])
     area = models.PositiveIntegerField()
@@ -23,7 +23,7 @@ class Clothe(models.Model):
     photo = models.CharField(max_length=30)
     state = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(2)])
     nbreUse = models.PositiveIntegerField()
-    categorie = models.ForeignKey('Categorie')
+    category = models.ForeignKey('Category')
     themes = models.ManyToManyField('Theme', blank=True)
     user = models.ForeignKey(User)
     colors = models.ManyToManyField('Color')#models.ManyToManyField('Color')
@@ -59,8 +59,8 @@ class Pattern(models.Model):   #lier to color              +       couleur joker
     ''' on y accède avec un Clothes object c comme ça :
     c.pattern_set.objects.all() '''
     color = models.ManyToManyField(Color)
-    jokerEnabled = models.BooleanField()
-    jokerColor = models.CharField(max_length=7)
+    #jokerEnabled = models.BooleanField()
+    #jokerColor = models.CharField(max_length=7)
         
     def __str__(self):
         return self.name

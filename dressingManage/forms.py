@@ -19,6 +19,6 @@ class AddClotheForm(forms.Form):
     warmth = forms.IntegerField(label="Chaleur du vêtement")
     photo = forms.CharField(label = "Image du vêtement")
     area = forms.CharField(label = "Zone du vêtement")
-    categorie = forms.IntegerField(label = "Catégorie du vêtement")
+    category = forms.IntegerField(label = "Catégorie du vêtement")
     themes = forms.ModelChoiceField(queryset=None, required=False, widget=FilteredSelectMultiple("Thèmes du vêt", is_stacked=False), label = "Thèmes du vêtement")
     color = forms.CharField(label = "Couleurs du vêtement", max_length=7)

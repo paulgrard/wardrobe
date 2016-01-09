@@ -1,9 +1,9 @@
 from django.contrib import admin
-from dressingManage.models import Categorie, Clothe, Color, Theme, Pattern, Parameter
+from dressingManage.models import Category, Clothe, Color, Theme, Pattern, Parameter
 
 # Register your models here.
 
-admin.site.register(Categorie)
+admin.site.register(Category)
 admin.site.register(Clothe)
 admin.site.register(Color)
 admin.site.register(Theme)
