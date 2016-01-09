@@ -1,8 +1,7 @@
 from django.conf.urls import patterns, url
 from . import views
 
-urlpatterns = patterns('userManage.views',
-    url(r'^add$', 'add', name='add'),
-    url(r'^deactivate$', 'deactivate', name='deactivate'),
-)
-
+urlpatterns = [
+    url(r'^add$', views.add, name='add'),
+    url(r'^deactivate$', views.deactivate, name='deactivate'),
+]

@@ -1,8 +1,7 @@
 from django.conf.urls import patterns, url
 from . import views
 
-urlpatterns = patterns('connection.views',
-    url(r'^$', 'connection', name='connection'),
-    url(r'^deconnection$', 'deconnection', name='deconnection'),
-)
-
+urlpatterns = [
+    url(r'^$', views.connection, name='connection'),
+    url(r'^deconnection$', views.deconnection, name='deconnection'),
+]
