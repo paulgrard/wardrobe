@@ -87,13 +87,14 @@ def getAllClothes(request):
 
 #faire un form pour passer string
 def createTheme(request):
-    '''data = []
+    '''data = {}
     li1 = []
     li2 = []
     li1.append('wesh')
     li1.append('yolo')
 
-    data = {'Phrase_swag':li1}
+    data['phrase']=li1
+    #data = {'Phrase_swag':li1}
 
     li2.append('Yo')
     li2.append('Maggle')
@@ -101,4 +102,21 @@ def createTheme(request):
     data['Jean']=li2'''
     
 
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+def getThemes(request):
+    data = []
+    themes = []
+    currentUser = request.user
+    
+    if currentUser.is_authenticated():
+        themesFromUser = Theme.objects.filter(userOwner = currentUser)
+        for theme in themesFromUser:
+            themes.append(theme.name)
+        data = {'themes':themes}
+    else:
+        data = {'new_clothe':'User is not authenticate'}
+        
+
+    #return render(request, 'dressingManage/addClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')

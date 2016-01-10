@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from connection.forms import ConnectionForm
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 
 from django.http import Http404
 
@@ -10,9 +10,8 @@ from django.contrib.auth import authenticate, login
 import json
 
 def connection(request):
-    #error = False
-    connected = None
-    data = []
+    success = False
+    data = {}
     
     if request.method == "POST":
         form = ConnectionForm(request.POST)
@@ -22,16 +21,14 @@ def connection(request):
             user = authenticate(username=username, password=password)  # Nous vérifions si les données sont correctes
             if user and user.is_active:  # Si l'objet renvoyé n'est pas None
                 login(request, user)  # nous connectons l'utilisateur
-                connected = True
-            else: # sinon une erreur sera affichée
-                #error = True
-                connected = False
-            data = {'connected':connected}
+                success = True
         else:
-            error = True
+            data['message'] = 'Form not validated'
+        data['success'] = success
     else:
         if request.user.is_authenticated():
-            data = {'connected':'User already connected'}
+            data['message'] = 'User already connected'
+            data['success'] = success
             return HttpResponse(json.dumps(data), content_type='application/json')
         form = ConnectionForm()
 
@@ -44,8 +41,14 @@ from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 
 def deconnection(request):
-    logout(request)
-    return redirect(reverse(connection))
+    if request.user.is_authenticated():
+        logout(request)
+        data= {'success':'True'}
+        
+        return HttpResponse(json.dumps(data), content_type='application/json')
+        #return redirect(reverse(connection))
+    
+    return HttpResponseForbidden('User is not authenticated')
 
 '''from django.contrib.auth.decorators import login_required
 
