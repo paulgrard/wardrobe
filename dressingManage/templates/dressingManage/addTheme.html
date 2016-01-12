@@ -1,0 +1,12 @@
+<h1>Ajout d'un thème</h1>
+
+{% if error %}
+<p><strong>Formulaire non rempli.</strong></p>
+{% endif %}
+
+<form method="post" action="{% url "dressingManage.views.addTheme" %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Ajouter" />
+</form>
+

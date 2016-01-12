@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseForbidden
-from dressingManage.forms import AddClotheForm, forms
+from dressingManage.forms import AddClotheForm, AddThemeForm, forms
 from django.contrib.auth.models import User
 from dressingManage.models import Clothe, Category, Color, Theme
 import json
@@ -75,7 +75,6 @@ def addClothe(request):
             ####################
             
             data['message'] = 'Need a POST request'
-            data['success'] = success
             
     else:
         return HttpResponseForbidden('User is not authenticated')
@@ -89,13 +88,13 @@ def getAllClothes(request):
     data = {}
     success = False
     clothes = []
-    photos = []
+    pKey = []
     currentUser = request.user
     if currentUser.is_authenticated():
         clothesFromUser = Clothe.objects.filter(user = currentUser)
         for clothe in clothesFromUser:
-            photos.append(clothe.pk)
-        data['clothes'] = photos
+            pKey.append(clothe.pk)
+        data['clothes'] = pKey
         success = True
     else:
         return HttpResponseForbidden('User is not authenticated')
@@ -104,7 +103,7 @@ def getAllClothes(request):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 #faire un form pour passer string
-def createTheme(request):
+def addTheme(request):
     '''data = {}
     li1 = []
     li2 = []
@@ -118,8 +117,66 @@ def createTheme(request):
     li2.append('Maggle')
 
     data['Jean']=li2'''
-    
+    data = {}
+    success = False
+    themes = []
+    currentUser = request.user
 
+    if currentUser.is_authenticated():
+        if request.method == "POST":
+            form = AddThemeForm(request.POST)
+            if form.is_valid():
+                nameT = form.cleaned_data["name"]
+
+                
+                themesFromUser = Theme.objects.filter(userOwner = currentUser)
+                for theme in themesFromUser:
+                    if theme.name == nameT:
+                        data['message'] = 'This name is already used'
+                        data['success'] = success
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+
+                
+                newTheme = Theme(name = nameT, userOwner = currentUser)
+                newTheme.save()
+                    
+                '''yolo=newClothe.colors.all()
+                for x in yolo:
+                    yolo2 = x.color
+                data = {'new_clothe':yolo2}
+                return HttpResponse(json.dumps(data), content_type='application/json')'''
+                    
+                if newTheme:
+                    success = True
+                else:
+                    data['message'] = 'Error during creation of theme'
+
+            else: # si form non valide
+                data['message'] = 'Form not validated'
+                
+            
+            #return HttpResponse(json.dumps(data), content_type='application/json')
+
+        else: #si non post
+
+            ####################
+            if currentUser.is_authenticated():
+                form = AddThemeForm()
+                '''themesFromUser = Theme.objects.filter(userOwner = currentUser)
+                for theme in themesFromUser:
+                    themes.append(theme.name)
+                data = {'themes':themes}'''
+            else:
+                return HttpResponseForbidden('User is not authenticated')
+            ####################
+            
+            data['message'] = 'Need a POST request'
+            
+    else:
+        return HttpResponseForbidden('User is not authenticated')
+
+    data['success'] = success
+    return render(request, 'dressingManage/addTheme.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def getThemes(request):
