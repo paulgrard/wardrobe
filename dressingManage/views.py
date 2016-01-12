@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseForbidden
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from dressingManage.forms import AddClotheForm, AddThemeForm, forms
 from django.contrib.auth.models import User
 from dressingManage.models import Clothe, Category, Color, Theme
@@ -197,4 +197,17 @@ def getThemes(request):
     data['success'] = success
     
     #return render(request, 'dressingManage/addClothe.html', locals())
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def deleteTheme(request, id):
+    data = {}
+    success = False
+    currentUser = request.user
+    
+    themeToDel = get_object_or_404(Theme, id = id, userOwner = currentUser)
+
+    themeToDel.delete()
+    success = True
+    data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
