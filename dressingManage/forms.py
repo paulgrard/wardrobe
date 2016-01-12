@@ -26,4 +26,8 @@ class AddClotheForm(forms.Form):
 
 class AddThemeForm(forms.Form):
         
-        name = forms.CharField(label = "Nom du thème", max_length=30)
+    name = forms.CharField(label = "Nom du thème", max_length=30)
+    
+class GetThemeForm(forms.Form):
+        
+    name = forms.CharField(label = "Nom du thème", max_length=30)

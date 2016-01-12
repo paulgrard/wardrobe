@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden, Http404
-from dressingManage.forms import AddClotheForm, AddThemeForm, forms
+from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms
 from django.contrib.auth.models import User
 from dressingManage.models import Clothe, Category, Color, Theme
 import json
@@ -200,6 +200,45 @@ def getThemes(request):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
+def getTheme(request):
+    data = {}
+    success = False
+    currentUser = request.user
+    
+    if currentUser.is_authenticated():
+        if request.method == "POST":
+            form = GetThemeForm(request.POST)
+            if form.is_valid():
+                nameT = form.cleaned_data["name"]
+                
+                theme = get_object_or_404(Theme, name = nameT, userOwner = currentUser)
+                data['theme'] = theme.id
+                success = True
+                
+            else: # si form non valide
+                data['message'] = 'Form not validated'
+
+                
+        else: #si non post
+
+            ####################
+            if currentUser.is_authenticated():
+                form = GetThemeForm()
+            else:
+                return HttpResponseForbidden('User is not authenticated')
+            ####################
+            
+            data['message'] = 'Need a POST request'
+
+
+            
+    else:
+        return HttpResponseForbidden('User is not authenticated')
+        
+    data['success'] = success
+    
+    #return render(request, 'dressingManage/getTheme.html', locals())
+    return HttpResponse(json.dumps(data), content_type='application/json')
     
 def deleteTheme(request, id):
     data = {}
