@@ -200,14 +200,20 @@ def getThemes(request):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
+    
 def deleteTheme(request, id):
     data = {}
     success = False
     currentUser = request.user
     
-    themeToDel = get_object_or_404(Theme, id = id, userOwner = currentUser)
+    if currentUser.is_authenticated():
+        themeToDel = get_object_or_404(Theme, id = id, userOwner = currentUser)
 
-    themeToDel.delete()
-    success = True
-    data['success'] = success
+        themeToDel.delete()
+        success = True
+        data['success'] = success
+        
+    else:
+        return HttpResponseForbidden('User is not authenticated')
+    
     return HttpResponse(json.dumps(data), content_type='application/json')
