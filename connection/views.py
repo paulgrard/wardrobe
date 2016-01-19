@@ -35,7 +35,8 @@ def connection(request):
     #return render(request, 'connection/connection.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
-
+def getToken(request):
+    return render(request, 'connection/getToken.html', locals())
 
 from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
