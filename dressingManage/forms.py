@@ -21,7 +21,9 @@ class AddClotheForm(forms.Form):
     area = forms.CharField(label = "Zone du vêtement")
     category = forms.IntegerField(label = "Catégorie du vêtement")
     themes = forms.ModelChoiceField(queryset=None, required=False, widget=FilteredSelectMultiple("Thèmes du vêt", is_stacked=False), label = "Thèmes du vêtement")
-    color = forms.CharField(label = "Couleurs du vêtement", max_length=7)
+    color1 = forms.CharField(label = "Couleur 1 du vêtement", max_length=7, required=False)
+    color2 = forms.CharField(label = "Couleur 2 du vêtement", max_length=7, required=False)
+    color3 = forms.CharField(label = "Couleur 3 du vêtement", max_length=7, required=False)
 
 
 class AddThemeForm(forms.Form):

@@ -29,7 +29,16 @@ def addClothe(request):
                 photoC = form.cleaned_data["photo"]
                 categoryC = Category.objects.get(name = form.cleaned_data["category"], area = form.cleaned_data["area"])
                 themesC = form.cleaned_data["themes"]
-                colorsC = form.cleaned_data["color"]
+                color1C = form.cleaned_data["color1"]
+                color2C = form.cleaned_data["color2"]
+                color3C = form.cleaned_data["color3"]
+                colorsC = [color1C]
+
+                if color2C:
+                    colorsC.append(color2C)
+
+                if color3C:
+                    colorsC.append(color3C)
 
                 newClothe = Clothe(warmth = warmthC, photo = photoC, state = 0, nbreUse = 0, category = categoryC, user = currentUser)
                 newClothe.save()
@@ -37,10 +46,21 @@ def addClothe(request):
                     newClothe.themes.add(themesC)
                     
                 #for valColor in colorsC:
-                if colorsC:
-                    col = Color(color = colorsC)#color = valColor
-                    col.save()
-                    newClothe.colors.add(col)
+                if len(colorsC)>3:
+                    data['success'] = False
+                    data['message'] = 'More than 3 colors'
+                    
+                    return HttpResponse(json.dumps(data), content_type='application/json')
+
+                else:
+                    for c in colorsC:
+                        try:
+                            colorAlrdyExist = Color.objects.get(color = c)
+                            newClothe.colors.add(colorAlrdyExist)
+                        except Color.DoesNotExist:
+                            col = Color(color = c)
+                            col.save()
+                            newClothe.colors.add(col)
                     
                 '''yolo=newClothe.colors.all()
                 for x in yolo:
@@ -80,7 +100,7 @@ def addClothe(request):
         return HttpResponseForbidden('User is not authenticated')
 
     data['success'] = success
-    #return render(request, 'dressingManage/addClothe.html', locals())
+    return render(request, 'dressingManage/addClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
