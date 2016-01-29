@@ -49,8 +49,8 @@ class Theme(models.Model):
     name = models.CharField(max_length=30)
     userOwner = models.ForeignKey(User)
     
-    def __str__(self):
-        return self.name
+    '''def __str__(self):
+        return self.name'''
 
 
 class Pattern(models.Model):   #lier to color              +       couleur joker       + champs bool joker

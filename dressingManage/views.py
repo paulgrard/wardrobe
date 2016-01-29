@@ -183,13 +183,18 @@ def getThemes(request):
     data = {}
     success = False
     themes = []
+    idTheme = []
     currentUser = request.user
     
     if currentUser.is_authenticated():
         themesFromUser = Theme.objects.filter(userOwner = currentUser)
         for theme in themesFromUser:
             themes.append(theme.name)
+            idTheme.append(theme.id)
+        
         data['themes'] = themes
+        data['id'] = idTheme
+        
         success = True
     else:
         return HttpResponseForbidden('User is not authenticated')
