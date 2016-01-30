@@ -131,6 +131,28 @@ def getAllClothes(request):
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+
+
+def getClothesFromCategory(request, nameC):
+    data = {}
+    success = False
+    clothes = []
+    pKey = []
+    currentUser = request.user
+    if currentUser.is_authenticated():
+        clothesFromCat = Clothe.objects.filter(user = currentUser, category = nameC)
+        for clothe in clothesFromCat:
+            pKey.append(clothe.pk)
+        data['clothes'] = pKey
+        success = True
+    else:
+        return HttpResponseForbidden('User is not authenticated')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+
 #faire un form pour passer string
 def addTheme(request):
     '''data = {}
@@ -207,6 +229,8 @@ def addTheme(request):
     data['success'] = success
     return render(request, 'dressingManage/addTheme.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 
 def getThemes(request):
     data = {}
@@ -317,4 +341,43 @@ def getColors(request, idC):
         return HttpResponseForbidden('User is not authenticated')
     
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+
     
+'''from django.templatetags.static import static
+from django.http.request import build_absolute_uri'''
+
+from wardrobe.settings import IMG_FOLDER
+
+def getPicture(request, idC):
+    data = {}
+    success = False
+    clothes = []
+    pKey = []
+    currentUser = request.user
+    if currentUser.is_authenticated():
+        clothing = get_object_or_404(Clothe, id = idC, user = currentUser)
+        if clothing:
+            pict = clothing.photo
+            '''relative_url = static(pict)
+            
+            absolute_url = build_absolute_uri(relative_url)'''
+            
+            image_data = open(IMG_FOLDER+pict, "rb").read()
+            return HttpResponse(image_data, content_type="image/jpeg")
+            '''try:
+                with open(pict, "rb") as f:
+                    return HttpResponse(f.read(), mimetype="image/jpeg")
+            except IOError:
+                red = Image.new('RGBA', (1, 1), (255,0,0,0))
+                response = HttpResponse(mimetype="image/jpeg")
+                red.save(response, "JPEG")
+                return response'''
+        data['clothes'] = pKey
+        success = True
+    else:
+        return HttpResponseForbidden('User is not authenticated')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')
