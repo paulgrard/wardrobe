@@ -23,7 +23,7 @@ def addClothe(request):
 
     if currentUser.is_authenticated():
         if request.method == "POST":
-            form = AddClotheForm(request.POST, user=request.user)
+            form = AddClotheForm(request.POST) #old arguments , user=request.user
             if form.is_valid():
                 warmthC = form.cleaned_data["warmth"]
                 photoC = form.cleaned_data["photo"]
@@ -43,7 +43,16 @@ def addClothe(request):
                 newClothe = Clothe(warmth = warmthC, photo = photoC, state = 0, nbreUse = 0, category = categoryC, user = currentUser)
                 newClothe.save()
                 if themesC:
-                    newClothe.themes.add(themesC)
+                    #newClothe.themes.add(themesC)
+                    for i in themesC.split("-"):
+                        try:
+                            thm = Theme.objects.get(id = int(i), userOwner=request.user)
+                            newClothe.themes.add(thm)
+                        except Theme.DoesNotExist:
+                            data['success'] = False
+                            data['message'] = 'One of the themes does not exist'
+                    
+                            return HttpResponse(json.dumps(data), content_type='application/json')
                     
                 #for valColor in colorsC:
                 if len(colorsC)>3:
@@ -85,7 +94,7 @@ def addClothe(request):
 
             ####################
             if currentUser.is_authenticated():
-                form = AddClotheForm(user=request.user)
+                form = AddClotheForm()#old parameters user=request.user
                 '''themesFromUser = Theme.objects.filter(userOwner = currentUser)
                 for theme in themesFromUser:
                     themes.append(theme.name)
