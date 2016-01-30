@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'^addTheme$',views.addTheme),
     url(r'^getThemes$',views.getThemes),
     url(r'^getTheme$',views.getTheme),
-    url(r'^deleteTheme/(?P<id>\d+)$', views.deleteTheme),
+    url(r'^deleteTheme/(?P<idT>\d+)$', views.deleteTheme),
+    url(r'^getColors/(?P<idC>\d+)$', views.getColors),
 ]

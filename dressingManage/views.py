@@ -80,7 +80,7 @@ def addClothe(request):
                 if newClothe:
                     success = True
                 else:
-                    data['message'] = 'Error during creation of clothe'
+                    data['message'] = 'Error during creation of clothing'
                         
                 
 
@@ -274,13 +274,13 @@ def getTheme(request):
     #return render(request, 'dressingManage/getTheme.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
     
-def deleteTheme(request, id):
+def deleteTheme(request, idT):
     data = {}
     success = False
     currentUser = request.user
     
     if currentUser.is_authenticated():
-        themeToDel = get_object_or_404(Theme, id = id, userOwner = currentUser)
+        themeToDel = get_object_or_404(Theme, id = idT, userOwner = currentUser)
 
         themeToDel.delete()
         success = True
@@ -290,3 +290,31 @@ def deleteTheme(request, id):
         return HttpResponseForbidden('User is not authenticated')
     
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def getColors(request, idC):
+    data = {}
+    success = False
+    currentUser = request.user
+    colors = []
+    
+    if currentUser.is_authenticated():
+        clothing = get_object_or_404(Clothe, id = idC, user = currentUser)
+        if clothing:
+            colorsFromClothe = clothing.colors
+            for c in colorsFromClothe.all():
+                colors.append(c.color)
+            
+            data['colors'] = colors
+            success = True
+        
+        else:
+            data['message'] = "Clothing not found"
+            
+        data['success'] = success
+        
+    else:
+        return HttpResponseForbidden('User is not authenticated')
+    
+    return HttpResponse(json.dumps(data), content_type='application/json')
+    
