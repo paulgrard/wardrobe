@@ -344,38 +344,23 @@ def getColors(request, idC):
 
 
 
-    
-'''from django.templatetags.static import static
-from django.http.request import build_absolute_uri'''
-
 from wardrobe.settings import IMG_FOLDER
 
 def getPicture(request, idC):
     data = {}
     success = False
-    clothes = []
-    pKey = []
     currentUser = request.user
     if currentUser.is_authenticated():
         clothing = get_object_or_404(Clothe, id = idC, user = currentUser)
         if clothing:
             pict = clothing.photo
-            '''relative_url = static(pict)
-            
-            absolute_url = build_absolute_uri(relative_url)'''
             
             image_data = open(IMG_FOLDER+pict, "rb").read()
+            success = True
             return HttpResponse(image_data, content_type="image/jpeg")
-            '''try:
-                with open(pict, "rb") as f:
-                    return HttpResponse(f.read(), mimetype="image/jpeg")
-            except IOError:
-                red = Image.new('RGBA', (1, 1), (255,0,0,0))
-                response = HttpResponse(mimetype="image/jpeg")
-                red.save(response, "JPEG")
-                return response'''
-        data['clothes'] = pKey
-        success = True
+        else:
+            data['message'] = "Error during creation of the clothing"
+        
     else:
         return HttpResponseForbidden('User is not authenticated')
 
