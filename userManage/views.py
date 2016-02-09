@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import login, logout
 from userManage.forms import AddForm, forms
 from django.contrib.auth.models import User
 import json
-# Create your views here.
+
 
 def add(request):
     data = {}
@@ -17,26 +18,20 @@ def add(request):
             new_mail = form.cleaned_data["mail"]
             new_password = form.cleaned_data["password"]
             if User.objects.filter(email=new_mail).exists() or User.objects.filter(username=new_username).exists():
-                data['message'] = 'This email or username is already used'
+                data['message'] = 'Ce mail ou ce pseudo est déja utilisé.'
             else:
                 user = User.objects.create_user(username=new_username, email=new_mail, password=new_password)
                 if user:
-                    #data = {'new_user':user.username}
-                    user_co = authenticate(username=new_username, password=new_password)  # Nous vérifions si les données sont correctes
-                    if user_co and user_co.is_active:  # Si l'objet renvoyé n'est pas None
-                        login(request, user_co)  # nous connectons l'utilisateur
-                        success = True
-                    else:
-                        data['message'] = 'Error during connection of the user'
+                    success = True
                 else:
-                    data['message'] = 'Error during creation of the user'
+                    data['message'] = 'Erreur lors de la création de l\'utilisateur.'
                     
         else: #si form non valide
-            data['message'] = 'Form not validated'
+            data['message'] = 'Formulaire non valide.'
             
     else: #si non requete POST
         form = AddForm()
-        data['message'] = 'Need a POST request'
+        data['message'] = 'Une requête POST est nécessaire.'
 
     data['success'] = success
     #return render(request, 'userManage/add.html', locals())
@@ -47,7 +42,6 @@ def add(request):
 def deactivate(request):
     data = {}
     success = False
-    flag = False
     
     if request.user.is_authenticated():
         userToDeactivate = request.user
@@ -55,14 +49,11 @@ def deactivate(request):
             userToDeactivate.is_active=False
             userToDeactivate.save()
             success = True
-            #data = {'userDeactivated':userToDeactivate.username}
             logout(request)
         else:
-            data['message'] = 'User already deactivated'
+            data['message'] = 'Utilisateur déjà désactivé.'
     else:
-        return HttpResponseForbidden('User is not authenticated')
-        #print('User not authenticated')
+        return HttpResponseForbidden('Utilisateur non identifié')
 
     data['success'] = success
-    #return render(request, 'userManage/deactivate.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
