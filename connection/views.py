@@ -1,13 +1,11 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render, redirect
 from connection.forms import ConnectionForm
-
 from django.http import HttpResponse, HttpResponseForbidden
-
 from django.http import Http404
-
 from django.contrib.auth import authenticate, login
-
 import json
+
 
 def connection(request):
     success = False
@@ -23,16 +21,16 @@ def connection(request):
                 login(request, user)  # nous connectons l'utilisateur
                 success = True
         else:
-            data['message'] = 'Form not validated'
+            data['message'] = 'Formulaire non valide.'
         data['success'] = success
     else:
         if request.user.is_authenticated():
-            data['message'] = 'User already connected'
+            data['message'] = 'Utilisateur déjà connecté.'
             data['success'] = success
             return HttpResponse(json.dumps(data), content_type='application/json')
         form = ConnectionForm()
 
-    return render(request, 'connection/connection.html', locals())
+    #return render(request, 'connection/connection.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def getToken(request):
@@ -49,7 +47,7 @@ def deconnection(request):
         return HttpResponse(json.dumps(data), content_type='application/json')
         #return redirect(reverse(connection))
     
-    return HttpResponseForbidden('User is not authenticated')
+    return HttpResponseForbidden('Utilisateur non authentifié')
 
 '''from django.contrib.auth.decorators import login_required
 

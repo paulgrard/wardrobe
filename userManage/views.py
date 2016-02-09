@@ -53,7 +53,7 @@ def deactivate(request):
         else:
             data['message'] = 'Utilisateur déjà désactivé.'
     else:
-        return HttpResponseForbidden('Utilisateur non identifié')
+        return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
