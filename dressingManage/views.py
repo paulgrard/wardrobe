@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms
@@ -5,7 +6,6 @@ from django.contrib.auth.models import User
 from dressingManage.models import Clothe, Category, Color, Theme
 import json
 
-# Create your views here.
 
 def accueil(request):
     return render(request, 'dressingManage/accueil.html')
@@ -50,14 +50,14 @@ def addClothe(request):
                             newClothe.themes.add(thm)
                         except Theme.DoesNotExist:
                             data['success'] = False
-                            data['message'] = 'One of the themes does not exist'
+                            data['message'] = 'Un des thèmes n\'existe pas.'
                     
                             return HttpResponse(json.dumps(data), content_type='application/json')
                     
                 #for valColor in colorsC:
                 if len(colorsC)>3:
                     data['success'] = False
-                    data['message'] = 'More than 3 colors'
+                    data['message'] = 'Plus de 3 couleurs passées en paramètres.'
                     
                     return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -70,22 +70,16 @@ def addClothe(request):
                             col = Color(color = c)
                             col.save()
                             newClothe.colors.add(col)
-                    
-                '''yolo=newClothe.colors.all()
-                for x in yolo:
-                    yolo2 = x.color
-                data = {'new_clothe':yolo2}
-                return HttpResponse(json.dumps(data), content_type='application/json')'''
-                    
+                
                 if newClothe:
                     success = True
                 else:
-                    data['message'] = 'Error during creation of clothing'
+                    data['message'] = 'Erreur lors de la création du vêtement.'
                         
                 
 
             else: # si form non valide
-                data['message'] = 'Form not validated'
+                data['message'] = 'Formulaire non valide.'
                 
             
             #return HttpResponse(json.dumps(data), content_type='application/json')
@@ -95,18 +89,14 @@ def addClothe(request):
             ####################
             if currentUser.is_authenticated():
                 form = AddClotheForm()#old parameters user=request.user
-                '''themesFromUser = Theme.objects.filter(userOwner = currentUser)
-                for theme in themesFromUser:
-                    themes.append(theme.name)
-                data = {'themes':themes}'''
             else:
-                return HttpResponseForbidden('User is not authenticated')
+                return HttpResponseForbidden('Utilisateur non authentifié')
             ####################
             
-            data['message'] = 'Need a POST request'
+            data['message'] = 'Une requête POST est nécessaire.'
             
     else:
-        return HttpResponseForbidden('User is not authenticated')
+        return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
     return render(request, 'dressingManage/addClothe.html', locals())
@@ -126,7 +116,7 @@ def getAllClothes(request):
         data['clothes'] = pKey
         success = True
     else:
-        return HttpResponseForbidden('User is not authenticated')
+        return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
@@ -146,7 +136,7 @@ def getClothesFromCategory(request, nameC):
         data['clothes'] = pKey
         success = True
     else:
-        return HttpResponseForbidden('User is not authenticated')
+        return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
@@ -155,19 +145,6 @@ def getClothesFromCategory(request, nameC):
 
 #faire un form pour passer string
 def addTheme(request):
-    '''data = {}
-    li1 = []
-    li2 = []
-    li1.append('wesh')
-    li1.append('yolo')
-
-    data['phrase']=li1
-    #data = {'Phrase_swag':li1}
-
-    li2.append('Yo')
-    li2.append('Maggle')
-
-    data['Jean']=li2'''
     data = {}
     success = False
     themes = []
@@ -183,7 +160,7 @@ def addTheme(request):
                 themesFromUser = Theme.objects.filter(userOwner = currentUser)
                 for theme in themesFromUser:
                     if theme.name == nameT:
-                        data['message'] = 'This name is already used'
+                        data['message'] = 'Ce nom est déja utilisé.'
                         data['success'] = success
                         return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -200,10 +177,10 @@ def addTheme(request):
                 if newTheme:
                     success = True
                 else:
-                    data['message'] = 'Error during creation of theme'
+                    data['message'] = 'Erreur lors de la création du thème.'
 
             else: # si form non valide
-                data['message'] = 'Form not validated'
+                data['message'] = 'Formulaire non valide.'
                 
             
             #return HttpResponse(json.dumps(data), content_type='application/json')
@@ -213,18 +190,14 @@ def addTheme(request):
             ####################
             if currentUser.is_authenticated():
                 form = AddThemeForm()
-                '''themesFromUser = Theme.objects.filter(userOwner = currentUser)
-                for theme in themesFromUser:
-                    themes.append(theme.name)
-                data = {'themes':themes}'''
             else:
-                return HttpResponseForbidden('User is not authenticated')
+                return HttpResponseForbidden('Utilisateur non authentifié')
             ####################
             
-            data['message'] = 'Need a POST request'
+            data['message'] = 'Une requête POST est nécessaire.'
             
     else:
-        return HttpResponseForbidden('User is not authenticated')
+        return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
     return render(request, 'dressingManage/addTheme.html', locals())
@@ -250,7 +223,7 @@ def getThemes(request):
         
         success = True
     else:
-        return HttpResponseForbidden('User is not authenticated')
+        return HttpResponseForbidden('Utilisateur non authentifié')
         
     data['success'] = success
     
@@ -274,7 +247,7 @@ def getTheme(request):
                 success = True
                 
             else: # si form non valide
-                data['message'] = 'Form not validated'
+                data['message'] = 'Formulaire non valide.'
 
                 
         else: #si non post
@@ -283,15 +256,15 @@ def getTheme(request):
             if currentUser.is_authenticated():
                 form = GetThemeForm()
             else:
-                return HttpResponseForbidden('User is not authenticated')
+                return HttpResponseForbidden('Utilisateur non authentifié')
             ####################
             
-            data['message'] = 'Need a POST request'
+            data['message'] = 'Une requête POST est nécessaire.'
 
 
             
     else:
-        return HttpResponseForbidden('User is not authenticated')
+        return HttpResponseForbidden('Utilisateur non authentifié')
         
     data['success'] = success
     
@@ -311,7 +284,7 @@ def deleteTheme(request, idT):
         data['success'] = success
         
     else:
-        return HttpResponseForbidden('User is not authenticated')
+        return HttpResponseForbidden('Utilisateur non authentifié')
     
     return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -333,12 +306,12 @@ def getColors(request, idC):
             success = True
         
         else:
-            data['message'] = "Clothing not found"
+            data['message'] = "Vêtement non trouvé."
             
         data['success'] = success
         
     else:
-        return HttpResponseForbidden('User is not authenticated')
+        return HttpResponseForbidden('Utilisateur non authentifié')
     
     return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -359,10 +332,10 @@ def getPicture(request, idC):
             success = True
             return HttpResponse(image_data, content_type="image/jpeg")
         else:
-            data['message'] = "Error during creation of the clothing"
+            data['message'] = "Erreur lors de la création du vêtement."
         
     else:
-        return HttpResponseForbidden('User is not authenticated')
+        return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
