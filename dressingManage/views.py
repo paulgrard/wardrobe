@@ -107,12 +107,35 @@ def getAllClothes(request):
     data = {}
     success = False
     clothes = []
-    pKey = []
+    pKey = {}    
+    
+    
     currentUser = request.user
     if currentUser.is_authenticated():
         clothesFromUser = Clothe.objects.filter(user = currentUser)
         for clothe in clothesFromUser:
-            pKey.append(clothe.pk)
+            themes = []
+            colors = []
+            temp = {}
+            categ = get_object_or_404(Category, name = clothe.category.name)
+
+            temp['warmth'] = clothe.warmth
+            temp['photo'] = clothe.photo
+            temp['state'] = clothe.state
+            temp['nbrUse'] = clothe.nbreUse
+            temp['category'] = clothe.category.name
+            temp['warmthCategory'] = categ.warmth
+            temp['area'] = categ.area
+            for t in clothe.themes.all():
+                themes.append(str(t))
+            temp['themes'] = themes
+            
+            for c in clothe.colors.all():
+                colors.append(str(c))
+            temp['colors'] = colors
+            
+            pKey[clothe.pk] = temp
+            #pKey.append(clothe.pk)
         data['clothes'] = pKey
         success = True
     else:
