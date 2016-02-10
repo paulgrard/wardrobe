@@ -340,6 +340,32 @@ def getColors(request, idC):
 
 
 
+def getAllColors(request):
+    data = {}
+    success = False
+    currentUser = request.user
+    colors = []
+    
+    if currentUser.is_authenticated():
+        col = Color.objects.all()
+        if col:
+            for c in col.all():
+                colors.append(c.color)
+            
+            data['colors'] = colors
+            success = True
+        
+        else:
+            data['message'] = "Erreur lors de la requête."
+            
+        data['success'] = success
+        
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+    
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 from wardrobe.settings import IMG_FOLDER
 
 def getPicture(request, idC):
