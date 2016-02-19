@@ -64,12 +64,14 @@ def addClothe(request):
                 else:
                     for c in colorsC:
                         try:
-                            colorAlrdyExist = Color.objects.get(color = c)
+                            colorAlrdyExist = Color.objects.get(code = c)
                             newClothe.colors.add(colorAlrdyExist)
                         except Color.DoesNotExist:
-                            col = Color(color = c)
+                            '''col = Color(color = c)
                             col.save()
-                            newClothe.colors.add(col)
+                            newClothe.colors.add(col)'''
+                            data['success'] = False
+                            data['message'] = 'Une des couleurs n\'existe pas.'
                 
                 if newClothe:
                     success = True
@@ -99,7 +101,7 @@ def addClothe(request):
         return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
-    return render(request, 'dressingManage/addClothe.html', locals())
+    #return render(request, 'dressingManage/addClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -131,7 +133,7 @@ def getAllClothes(request):
             temp['themes'] = themes
             
             for c in clothe.colors.all():
-                colors.append(str(c))
+                colors.append(str(c.code))
             temp['colors'] = colors
             
             pKey[clothe.pk] = temp
@@ -223,7 +225,7 @@ def addTheme(request):
         return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
-    return render(request, 'dressingManage/addTheme.html', locals())
+    #return render(request, 'dressingManage/addTheme.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -323,7 +325,7 @@ def getColors(request, idC):
         if clothing:
             colorsFromClothe = clothing.colors
             for c in colorsFromClothe.all():
-                colors.append(c.color)
+                colors.append(c.code)
             
             data['colors'] = colors
             success = True
@@ -350,7 +352,7 @@ def getAllColors(request):
         col = Color.objects.all()
         if col:
             for c in col.all():
-                colors.append(c.color)
+                colors.append(c.code)
             
             data['colors'] = colors
             success = True

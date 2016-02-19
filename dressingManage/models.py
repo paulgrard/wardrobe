@@ -40,10 +40,11 @@ class Clothe(models.Model):
         return self.photo
 
 class Color(models.Model):
-    color = models.CharField(max_length=7)
+    name = models.CharField(max_length=20)
+    code = models.CharField(max_length=7)
 
     def __str__(self):
-        return self.color
+        return self.name
 
 class Theme(models.Model):
     name = models.CharField(max_length=30)
