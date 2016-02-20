@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden, Http404
-from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms
+from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms, WeatherForm
 from django.contrib.auth.models import User
 from dressingManage.models import Clothe, Category, Color, Theme
 import json
+from urllib.request import urlopen
 
 
 def accueil(request):
@@ -390,3 +391,45 @@ def getPicture(request, idC):
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def getWeather(request):
+    data = {}
+    success = False
+    currentUser = request.user
+    if currentUser.is_authenticated():
+        if request.method == "POST":
+            form = WeatherForm(request.POST)
+            if form.is_valid():
+                lon = form.cleaned_data["lon"]
+                lat = form.cleaned_data["lat"]
+                content = urlopen('http://api.openweathermap.org/data/2.5/find?lat=' + str(lat) + '&lon=' + str(lon) + '&cnt=1&appid=f7dea76625663a7ce872ba2c9c206fec').read().decode("utf-8")
+                content = json.loads(content)
+                temp = content["list"][0]["main"]["temp"]
+                data["temp"] = int(round(temp - 273.15))
+                weather = content["list"][0]["weather"][0]["main"]
+                data["weather"] = weather
+                success = True
+            else: # si form non valide
+                data['message'] = 'Formulaire non valide.'
+                
+        else: #si non post
+
+            ####################
+            if currentUser.is_authenticated():
+                form = WeatherForm()
+                return render(request, 'dressingManage/getWeather.html', locals())
+            else:
+                return HttpResponseForbidden('Utilisateur non authentifié')
+            ####################
+            
+            data['message'] = 'Une requête POST est nécessaire.'
+
+            
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+

@@ -34,3 +34,9 @@ class AddThemeForm(forms.Form):
 class GetThemeForm(forms.Form):
         
     name = forms.CharField(label = "Nom du thème", max_length=30)
+
+
+class WeatherForm(forms.Form):
+        
+    lat = forms.CharField(label = "lat", max_length=20)
+    lon = forms.CharField(label = "lon", max_length=20)

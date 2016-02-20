@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^getColors/(?P<idC>\d+)$', views.getColors),
     url(r'^getAllColors$', views.getAllColors),
     url(r'^getPicture/(?P<idC>\d+)$', views.getPicture),
+    url(r'^getWeather$', views.getWeather),
 ]
