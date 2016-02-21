@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.accueil),
     url(r'^addClothe$',views.addClothe),
+    url(r'^editClothe/(?P<idC>\d+)$',views.editClothe),
     url(r'^getAllClothes$',views.getAllClothes),
     url(r'^getClothesFromCategory/(?P<nameC>\d+)$', views.getClothesFromCategory),
     url(r'^addTheme$',views.addTheme),

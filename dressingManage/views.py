@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden, Http404
-from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms, WeatherForm
+from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms, WeatherForm, EditClotheForm
 from django.contrib.auth.models import User
 from dressingManage.models import Clothe, Category, Color, Theme
 import json
@@ -15,6 +15,8 @@ def accueil(request):
 #plus voir au niveau BDD le coup de area dans categorie
 #pour l'instant on ne peut pas passer de theme et qu'une couleur
 #vérifier si la couleur existe déja et les contraindre à 3 couleurs maxi
+#passer id color plutot que code
+
 #couleur joker
 def addClothe(request):
     data = {}
@@ -103,6 +105,109 @@ def addClothe(request):
 
     data['success'] = success
     #return render(request, 'dressingManage/addClothe.html', locals())
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def editClothe(request,idC):
+    data = {}
+    success = True
+    themes = []
+    colorAlrdyExist = []
+    currentUser = request.user
+
+    if currentUser.is_authenticated():
+        if request.method == "POST":
+            form = EditClotheForm(request.POST) #old arguments , user=request.user
+            if form.is_valid():
+                warmthC = form.cleaned_data["warmth"]
+                photoC = form.cleaned_data["photo"]
+                categoryC = form.cleaned_data["category"] #Category.objects.get(name = form.cleaned_data["category"], area = form.cleaned_data["area"])
+                areaC = form.cleaned_data["area"]
+                themesC = form.cleaned_data["themes"]
+                color1C = form.cleaned_data["color1"]
+                color2C = form.cleaned_data["color2"]
+                color3C = form.cleaned_data["color3"]
+                colorsC = []
+                
+                
+                cloth = Clothe.objects.get(id = idC, user=request.user)
+
+                if categoryC and areaC:
+                    cat = get_object_or_404(Category, name = categoryC, area = areaC)
+                    cloth.category = cat
+
+                if not(categoryC) and areaC:
+                    success = False
+                    data['message'] = 'Le type de vêtement n\'a pas été indiqué.'
+
+                if not(areaC) and categoryC:
+                    catArea = cloth.category.area
+                    cat = get_object_or_404(Category, name = categoryC, area = catArea)
+                    cloth.category = cat
+                    
+                if warmthC:
+                    cloth.warmth = warmthC
+
+                if photoC:
+                    cloth.photo = photoC
+
+                '''if categoryC:
+                    cloth.category = categoryC'''
+
+                if themesC:
+                    for i in themesC.split("-"):
+                        try:
+                            themes.append(Theme.objects.get(id = int(i), userOwner=request.user))
+                        except Theme.DoesNotExist:
+                            data['success'] = False
+                            data['message'] = 'Un des thèmes n\'existe pas.'
+                    
+                            return HttpResponse(json.dumps(data), content_type='application/json')
+                    cloth.themes.set(themes)
+
+
+                if color1C:
+                    colorsC.append(color1C)
+
+                if color2C:
+                    colorsC.append(color2C)
+
+                if color3C:
+                    colorsC.append(color3C)
+
+                if color1C or color2C or color3C:
+                    for c in colorsC:
+                        try:
+                            colorAlrdyExist.append(Color.objects.get(code = c))
+                        except Color.DoesNotExist:
+                            data['success'] = False
+                            data['message'] = 'Une des couleurs n\'existe pas.'
+                    cloth.colors.set(colorAlrdyExist)
+                cloth.save()
+                
+
+            else: # si form non valide
+                data['message'] = 'Formulaire non valide.'
+                
+            
+            #return HttpResponse(json.dumps(data), content_type='application/json')
+
+        else: #si non post
+
+            ####################
+            if currentUser.is_authenticated():
+                form = EditClotheForm()#old parameters user=request.user
+            else:
+                return HttpResponseForbidden('Utilisateur non authentifié')
+            ####################
+            success = False
+            data['message'] = 'Une requête POST est nécessaire.'
+            
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+
+    data['success'] = success
+    #return render(request, 'dressingManage/editClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
