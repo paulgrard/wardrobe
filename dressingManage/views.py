@@ -155,7 +155,7 @@ def editClothe(request,idC):
                     cloth.category = categoryC'''
 
                 if themesC:
-                    for i in themesC.split("-"):
+                    for i in themesC.split("|"):
                         try:
                             themes.append(Theme.objects.get(id = int(i), userOwner=request.user))
                         except Theme.DoesNotExist:
