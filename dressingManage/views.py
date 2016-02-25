@@ -215,7 +215,7 @@ def getAllClothes(request):
     data = {}
     success = False
     clothes = []
-    pKey = {}    
+    pKey = []   
     
     
     currentUser = request.user
@@ -241,8 +241,9 @@ def getAllClothes(request):
             for c in clothe.colors.all():
                 colors.append(str(c.code))
             temp['colors'] = colors
+            temp['id'] = clothe.pk
             
-            pKey[clothe.pk] = temp
+            pKey.append(temp)
             #pKey.append(clothe.pk)
         data['clothes'] = pKey
         success = True
