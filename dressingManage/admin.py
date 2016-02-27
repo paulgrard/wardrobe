@@ -13,8 +13,13 @@ class ClotheAdmin(admin.ModelAdmin):
     list_display   = ('id', 'photo', 'user')
     list_filter    = ('user',)
     search_fields  = ('id', 'photo', 'user')
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display   = ('name', 'warmth', 'area', 'id')
+    list_filter    = ('id',)
+    search_fields  = ('name', 'id', 'warmth', 'area')
     
-admin.site.register(Category)
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Clothe, ClotheAdmin)
 admin.site.register(Color)
 admin.site.register(Theme, ThemeAdmin)

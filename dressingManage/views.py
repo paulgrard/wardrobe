@@ -30,7 +30,7 @@ def addClothe(request):
             if form.is_valid():
                 warmthC = form.cleaned_data["warmth"]
                 photoC = form.cleaned_data["photo"]
-                categoryC = Category.objects.get(name = form.cleaned_data["category"], area = form.cleaned_data["area"])
+                categoryC = Category.objects.get(pk = form.cleaned_data["category"], area = form.cleaned_data["area"]) #old    name = form.cleaned_data["category"]
                 themesC = form.cleaned_data["themes"]
                 color1C = form.cleaned_data["color1"]
                 color2C = form.cleaned_data["color2"]
@@ -133,7 +133,7 @@ def editClothe(request,idC):
                 cloth = Clothe.objects.get(id = idC, user=request.user)
 
                 if categoryC and areaC:
-                    cat = get_object_or_404(Category, name = categoryC, area = areaC)
+                    cat = get_object_or_404(Category, pk = categoryC, area = areaC)
                     cloth.category = cat
 
                 if not(categoryC) and areaC:
@@ -142,7 +142,7 @@ def editClothe(request,idC):
 
                 if not(areaC) and categoryC:
                     catArea = cloth.category.area
-                    cat = get_object_or_404(Category, name = categoryC, area = catArea)
+                    cat = get_object_or_404(Category, pk = categoryC, area = catArea)
                     cloth.category = cat
                     
                 if warmthC:
@@ -155,7 +155,7 @@ def editClothe(request,idC):
                     cloth.category = categoryC'''
 
                 if themesC:
-                    for i in themesC.split("|"):
+                    for i in themesC.split("-"):
                         try:
                             themes.append(Theme.objects.get(id = int(i), userOwner=request.user))
                         except Theme.DoesNotExist:
@@ -231,7 +231,7 @@ def getAllClothes(request):
             temp['photo'] = clothe.photo
             temp['state'] = clothe.state
             temp['nbrUse'] = clothe.nbreUse
-            temp['category'] = clothe.category.name
+            temp['category'] = clothe.category.pk
             temp['warmthCategory'] = categ.warmth
             temp['area'] = categ.area
             for t in clothe.themes.all():
@@ -255,14 +255,15 @@ def getAllClothes(request):
 
 
 
-def getClothesFromCategory(request, nameC):
+def getClothesFromCategory(request, idC):
     data = {}
     success = False
     clothes = []
     pKey = []
     currentUser = request.user
     if currentUser.is_authenticated():
-        clothesFromCat = Clothe.objects.filter(user = currentUser, category = nameC)
+        categ = get_object_or_404(Category, pk = idC)
+        clothesFromCat = Clothe.objects.filter(user = currentUser, category = categ)
         for clothe in clothesFromCat:
             pKey.append(clothe.pk)
         data['clothes'] = pKey
@@ -537,5 +538,3 @@ def getWeather(request):
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
-
-
