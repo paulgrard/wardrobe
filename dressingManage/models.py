@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 # Create your models here.                      pas d'ajout pattern et pas d'ajout de categorie
 
 class Category(models.Model):
-    name = models.PositiveIntegerField()   # passer en int?    old = max_length=30
-    warmth = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(3)])
+    name = models.CharField(max_length=30)   # passer en int?    old = max_length=30
+    warmth = models.IntegerField(validators=[MinValueValidator(0),MaxValueValidator(5)], blank = True, null = True)
     area = models.PositiveIntegerField()
     def __str__(self):
         return str(self.name)
