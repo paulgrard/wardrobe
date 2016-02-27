@@ -538,3 +538,30 @@ def getWeather(request):
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+
+def getCategoriesFromArea(request,idA):
+    data = {}
+    name = []
+    idC = []
+    temp = []
+    success = False
+    currentUser = request.user
+    if currentUser.is_authenticated():
+        
+        cats = Category.objects.filter(area = idA)
+        for c in cats:
+            cat = {}
+            cat["name"] = c.name
+            cat["id"] = c.pk
+            temp.append(cat)
+        data["categories"] = temp
+        success = True
+        
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
