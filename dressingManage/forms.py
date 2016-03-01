@@ -5,7 +5,10 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
 from dressingManage.models import Theme
+from django.core.exceptions import ValidationError
 
+
+    
 class AddClotheForm(forms.Form):
         
     '''def __init__(self, *args, **kwargs):
@@ -15,9 +18,16 @@ class AddClotheForm(forms.Form):
         self.fields['themes'].queryset = Theme.objects.filter(userOwner = currentUser) 
         #self.fields['themes']=forms.ModelChoiceField(queryset = Theme.objects.filter(userOwner = currentUser) , required=False, widget=FilteredSelectMultiple("Thèmes du vêt", is_stacked=False), label = "Thèmes du vêtement")'''
 
+
+    def validate_file_extension(value):
+        ext = [".jpg", ".JPG", ".jpeg", ".JPEG"]
+        if not value.name.endswith(tuple(ext)):
+            raise ValidationError('Le type de fichier n\'est pas pris en charge')
+        
         
     warmth = forms.IntegerField(label="Chaleur du vêtement")
-    photo = forms.CharField(label = "Image du vêtement")
+    #photoOld = forms.CharField(label = "Image du vêtement")
+    photo = forms.FileField(label = "Image du vêtement", validators=[validate_file_extension])
     area = forms.CharField(label = "Zone du vêtement")
     category = forms.IntegerField(label = "Catégorie du vêtement")
     themes = forms.CharField(label = "Ids des thèmes du vêtement", required=False)
@@ -30,6 +40,8 @@ class AddClotheForm(forms.Form):
     
     color3 = forms.CharField(label = "Couleur 3 du vêtement", max_length=7, min_length=7, required=False)
     quantity3 = forms.IntegerField(label = "Pourcentage 3 de la couleur", required=False)
+
+
 
 
 

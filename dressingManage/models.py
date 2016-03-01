@@ -20,7 +20,7 @@ class Category(models.Model):
 # mettre une limite pour warmth
 class Clothe(models.Model):
     warmth = models.PositiveIntegerField()
-    photo = models.CharField(max_length=30)
+    photo = models.CharField(max_length=30, null=True)
     state = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(2)])
     nbreUse = models.PositiveIntegerField()
     category = models.ForeignKey('Category')

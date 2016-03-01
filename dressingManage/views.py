@@ -7,15 +7,12 @@ from dressingManage.models import Clothe, Category, Color, Theme, Quantity
 import json
 from urllib.request import urlopen
 
+from wardrobe.settings import IMG_FOLDER
 
 def accueil(request):
     return render(request, 'dressingManage/accueil.html')
 
 #penser à renommer les photos et faire une requete avant d'ajouter la photo pour savoir si elle est unique ou non
-#plus voir au niveau BDD le coup de area dans categorie
-#pour l'instant on ne peut pas passer de theme et qu'une couleur
-#vérifier si la couleur existe déja et les contraindre à 3 couleurs maxi
-#passer id color plutot que code
 
 #couleur joker
 def addClothe(request):
@@ -23,13 +20,13 @@ def addClothe(request):
     success = False
     themes = []
     currentUser = request.user
-
+    
     if currentUser.is_authenticated():
         if request.method == "POST":
-            form = AddClotheForm(request.POST) #old arguments , user=request.user
+            form = AddClotheForm(request.POST, request.FILES) #old arguments , user=request.user
             if form.is_valid():
                 warmthC = form.cleaned_data["warmth"]
-                photoC = form.cleaned_data["photo"]
+                #photoC = form.cleaned_data["photoOld"]
                 categoryC = Category.objects.get(pk = form.cleaned_data["category"], area = form.cleaned_data["area"]) #old    name = form.cleaned_data["category"]
                 themesC = form.cleaned_data["themes"]
                 color1C = form.cleaned_data["color1"]
@@ -40,10 +37,20 @@ def addClothe(request):
                 quantity2C = form.cleaned_data["quantity2"]
                 quantity3C = form.cleaned_data["quantity3"]
                 quantitiesC = [quantity1C]
+                
 
-                newClothe = Clothe(warmth = warmthC, photo = photoC, state = 0, nbreUse = 0, category = categoryC, user = currentUser)
+            
+                newClothe = Clothe(warmth = warmthC, state = 0, nbreUse = 0, category = categoryC, user = currentUser)
                 newClothe.save()
 
+                photoName = str(newClothe.pk) + '.jpg'
+                
+                with open(IMG_FOLDER + photoName , 'wb+') as destination:
+                    for chunk in request.FILES['photo'].chunks():
+                        destination.write(chunk)
+
+                newClothe.photo = photoName
+                newClothe.save()
                 
                 if color2C and quantity2C:
                     if not quantity2C == 0:
@@ -120,7 +127,7 @@ def addClothe(request):
         return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
-    #return render(request, 'dressingManage/addClothe.html', locals())
+    return render(request, 'dressingManage/addClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
