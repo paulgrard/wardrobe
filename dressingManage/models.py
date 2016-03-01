@@ -27,6 +27,7 @@ class Clothe(models.Model):
     themes = models.ManyToManyField('Theme', blank=True)
     user = models.ForeignKey(User)
     colors = models.ManyToManyField('Color')#models.ManyToManyField('Color')
+    quantities = models.ManyToManyField('Quantity')
    # pattern = models.OneToManyField('Pattern')
 
     '''pour limiter les patterns a 3 ne pas oublier une methode du genre:
@@ -39,6 +40,13 @@ class Clothe(models.Model):
     def __str__(self):
         return self.photo
 
+class Quantity(models.Model):
+    quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)])
+    color = models.OneToOneField('Color')
+
+    def __str__(self):
+        return str(self.quantity)
+    
 class Color(models.Model):
     name = models.CharField(max_length=20)
     code = models.CharField(max_length=7)
