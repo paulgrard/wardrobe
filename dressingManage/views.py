@@ -18,7 +18,7 @@ def accueil(request):
 #passer id color plutot que code
 
 #couleur joker
-def addClothe(request):  #faire comme dans editclothe pour la category pour savoir si elle existe ou pas !!!!!
+def addClothe(request):
     data = {}
     success = False
     themes = []
@@ -120,7 +120,7 @@ def addClothe(request):  #faire comme dans editclothe pour la category pour savo
         return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
-    return render(request, 'dressingManage/addClothe.html', locals())
+    #return render(request, 'dressingManage/addClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 

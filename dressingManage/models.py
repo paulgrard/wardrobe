@@ -42,7 +42,7 @@ class Clothe(models.Model):
 
 class Quantity(models.Model):
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(100)])
-    color = models.OneToOneField('Color')
+    color = models.ForeignKey('Color') #OneToOneField('Color')
 
     def __str__(self):
         return str(self.quantity)
