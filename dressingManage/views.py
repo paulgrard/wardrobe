@@ -400,7 +400,6 @@ def getThemes(request):
         
     data['success'] = success
     
-    #return render(request, 'dressingManage/addClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
