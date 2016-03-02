@@ -47,8 +47,13 @@ class AddClotheForm(forms.Form):
 
 class EditClotheForm(forms.Form):
 
+    def validate_file_extension(value):
+        ext = [".jpg", ".JPG", ".jpeg", ".JPEG"]
+        if not value.name.endswith(tuple(ext)):
+            raise ValidationError('Le type de fichier n\'est pas pris en charge')
+        
     warmth = forms.IntegerField(label="Chaleur du vêtement", required=False)
-    photo = forms.CharField(label = "Image du vêtement", required=False)
+    photo = forms.FileField(label = "Image du vêtement", validators=[validate_file_extension], required=False)
     area = forms.CharField(label = "Zone du vêtement", required=False)
     category = forms.IntegerField(label = "Catégorie du vêtement", required=False)
     themes = forms.CharField(label = "Ids des thèmes du vêtement", required=False)

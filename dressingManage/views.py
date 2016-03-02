@@ -4,9 +4,9 @@ from django.http import HttpResponse, HttpResponseForbidden, Http404
 from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms, WeatherForm, EditClotheForm
 from django.contrib.auth.models import User
 from dressingManage.models import Clothe, Category, Color, Theme, Quantity
-import json
+import json, os
 from urllib.request import urlopen
-
+from django.core.files.uploadedfile import TemporaryUploadedFile
 from wardrobe.settings import IMG_FOLDER
 
 def accueil(request):
@@ -127,7 +127,7 @@ def addClothe(request):
         return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
-    return render(request, 'dressingManage/addClothe.html', locals())
+    #return render(request, 'dressingManage/addClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -140,10 +140,10 @@ def editClothe(request,idC):
 
     if currentUser.is_authenticated():
         if request.method == "POST":
-            form = EditClotheForm(request.POST) #old arguments , user=request.user
+            form = EditClotheForm(request.POST, request.FILES) #old arguments , user=request.user
             if form.is_valid():
                 warmthC = form.cleaned_data["warmth"]
-                photoC = form.cleaned_data["photo"]
+                #photoC = form.cleaned_data["photo"]
                 categoryC = form.cleaned_data["category"] #Category.objects.get(name = form.cleaned_data["category"], area = form.cleaned_data["area"])
                 areaC = form.cleaned_data["area"]
                 themesC = form.cleaned_data["themes"]
@@ -170,12 +170,16 @@ def editClothe(request,idC):
                     
                 if warmthC:
                     cloth.warmth = warmthC
+                    
 
-                if photoC:
-                    cloth.photo = photoC
-
-                '''if categoryC:
-                    cloth.category = categoryC'''
+                if form.cleaned_data['photo']:
+                    photoName = str(cloth.pk) + '.jpg'
+                    os.remove(IMG_FOLDER + photoName)
+                
+                    with open(IMG_FOLDER + photoName , 'wb+') as destination:
+                        for chunk in request.FILES['photo'].chunks():
+                            destination.write(chunk)
+                        
 
                 if themesC:
                     for i in themesC.split("-"):
