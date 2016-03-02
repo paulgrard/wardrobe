@@ -153,7 +153,7 @@ def editClothe(request,idC):
                 colorsC = []
                 
                 
-                cloth = Clothe.objects.get(id = idC, user=request.user)
+                cloth = Clothe.objects.get(id = idC, user=currentUser)
 
                 if categoryC and areaC:
                     cat = get_object_or_404(Category, pk = categoryC, area = areaC)
@@ -603,4 +603,23 @@ def getCategoriesFromArea(request,idA):
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def changeState(request, idC, state):
+    data = {}
+    success = False
+    currentUser = request.user
+    
+    if currentUser.is_authenticated():
+        cloth = Clothe.objects.get(id = idC, user=currentUser)
+        cloth.state = state
+        cloth.save()
+        success = True
+        
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
 
