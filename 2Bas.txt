@@ -1,0 +1,24 @@
+short
+1
+bermuda
+2
+pantalon
+3
+pantacourt
+2
+jogging
+3
+jean
+3
+legging
+2
+jupe
+1
+pyjama
+0
+salopette
+3
+combinaison
+5
+bas de costume
+3
