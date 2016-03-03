@@ -55,10 +55,4 @@ class Pattern(models.Model):
     def __str__(self):
         return self.name
 
-class Parameter(models.Model):
-    user = models.OneToOneField(User)
-    weatherEnabled = models.BooleanField()
-    chilliness = models.PositiveIntegerField()
-            
-    def __str__(self):
-        return self.user.username
+

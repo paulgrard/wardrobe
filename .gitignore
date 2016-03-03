@@ -1,4 +1,7 @@
 wardrobe\settings.py
+wardrobe/settings.py
 */**/*.pyc
+*/**/**/*.pyc
 .idea/
 __pycache__/
+db.sqlite3
