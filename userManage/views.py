@@ -34,7 +34,6 @@ def add(request):
         data['message'] = 'Une requête POST est nécessaire.'
 
     data['success'] = success
-    #return render(request, 'userManage/add.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
