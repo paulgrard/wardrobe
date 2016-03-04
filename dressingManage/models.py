@@ -25,7 +25,7 @@ class Clothe(models.Model):
     state = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(2)])
     nbreUse = models.PositiveIntegerField()
     category = models.ForeignKey('Category')
-    themes = models.ManyToManyField('Theme', blank=True)
+    themes = models.ManyToManyField('Theme')
     user = models.ForeignKey(User)
     colors = models.ManyToManyField('Color')#models.ManyToManyField('Color')
     quantities = models.ManyToManyField('Quantity')
