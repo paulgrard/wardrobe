@@ -136,6 +136,7 @@ def editClothe(request,idC):
     success = True
     themes = []
     colorAlrdyExist = []
+    quantitiesToPut = []
     currentUser = request.user
 
     if currentUser.is_authenticated():
@@ -151,9 +152,13 @@ def editClothe(request,idC):
                 color2C = form.cleaned_data["color2"]
                 color3C = form.cleaned_data["color3"]
                 colorsC = []
+                quantity1C = form.cleaned_data["quantity1"]
+                quantity2C = form.cleaned_data["quantity2"]
+                quantity3C = form.cleaned_data["quantity3"]
+                quantitiesC = []
 
 
-                cloth = Clothe.objects.get(id = idC, user=currentUser)
+                cloth = get_object_or_404(Clothe, id = idC, user=currentUser)
 
                 if categoryC and areaC:
                     cat = get_object_or_404(Category, pk = categoryC, area = areaC)
@@ -195,21 +200,35 @@ def editClothe(request,idC):
 
                 if color1C:
                     colorsC.append(color1C)
-
-                if color2C:
+                    quantitiesC.append(quantity1C)
                     colorsC.append(color2C)
-
-                if color3C:
+                    quantitiesC.append(quantity2C)
                     colorsC.append(color3C)
+                    quantitiesC.append(quantity3C)
 
-                if color1C or color2C or color3C:
+                    #récupère les anciennes quantités et les supprime de la BDD
+                    oldQuant = cloth.quantities
+                    for q in oldQuant.all():
+                        q.delete()
+
+
+                    #création des nouvelles couleurs et quantités
                     for c in colorsC:
                         try:
                             colorAlrdyExist.append(Color.objects.get(code = c))
+
+                            indice = colorsC.index(c)
+                            newQuantity = Quantity(quantity = quantitiesC[indice], color = Color.objects.get(code = c))
+                            newQuantity.save()
+
+                            quantitiesToPut.append(newQuantity)
+
                         except Color.DoesNotExist:
                             data['success'] = False
                             data['message'] = 'Une des couleurs n\'existe pas.'
                     cloth.colors.set(colorAlrdyExist)
+                    cloth.quantities.set(quantitiesToPut)
+
                 cloth.save()
 
 
@@ -390,7 +409,16 @@ def getThemes(request):
         for theme in themesFromUser:
             themes.append(theme.name)
             idTheme.append(theme.id)
+<<<<<<< HEAD
 
+=======
+
+        themesFromNullUser = Theme.objects.filter(userOwner = None)
+        for themeNull in themesFromNullUser:
+            themes.append(themeNull.name)
+            idTheme.append(themeNull.id)
+
+>>>>>>> ff1ce98ae2e26b25d500ac3ea9cd757e5b374677
         data['themes'] = themes
         data['id'] = idTheme
 
@@ -466,14 +494,34 @@ def getColors(request, idC):
     success = False
     currentUser = request.user
     colors = []
+<<<<<<< HEAD
 
+=======
+    temp = {}
+
+>>>>>>> ff1ce98ae2e26b25d500ac3ea9cd757e5b374677
     if currentUser.is_authenticated():
         clothing = get_object_or_404(Clothe, id = idC, user = currentUser)
         if clothing:
             colorsFromClothe = clothing.colors
+            quantFromClothe = clothing.quantities
+
             for c in colorsFromClothe.all():
+<<<<<<< HEAD
                 colors.append(c.code)
 
+=======
+                quanti = []
+                temp['code'] = c.code
+                for q in quantFromClothe.all():
+                    quant = Quantity.objects.get(id = q.id, color = c)
+                    quanti.append(quant.quantity)
+
+                temp['quantity'] = quanti
+
+                colors.append(temp)
+
+>>>>>>> ff1ce98ae2e26b25d500ac3ea9cd757e5b374677
             data['colors'] = colors
             success = True
 
