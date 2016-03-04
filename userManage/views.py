@@ -72,6 +72,7 @@ def setSex(request, sexType):
         param = get_object_or_404(Parameters, user = request.user)
         param.sex = sexType
         param.save()
+        success = True
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
 
