@@ -57,7 +57,7 @@ class Color(models.Model):
 
 class Theme(models.Model):
     name = models.CharField(max_length=30)
-    userOwner = models.ForeignKey(User)
+    userOwner = models.ForeignKey(User, blank = True, null = True)
     
     def __str__(self):
         return self.name
