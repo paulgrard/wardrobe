@@ -190,7 +190,7 @@ def editClothe(request,idC):
                 if themesC:
                     for i in themesC.split("-"):
                         try:
-                            themes.append(Theme.objects.get(Q(id = int(i)) & (Q(userOwner=request.user) | Q(userOwner=None)))
+                            themes.append(Theme.objects.get(Q(id = int(i)) & (Q(userOwner=request.user) | Q(userOwner=None))))
                         except Theme.DoesNotExist:
                             data['success'] = False
                             data['message'] = 'Un des thèmes n\'existe pas.'
