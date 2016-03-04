@@ -18,7 +18,7 @@ class Clothe(models.Model):
     state = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(2)])
     nbreUse = models.PositiveIntegerField()
     category = models.ForeignKey('Category')
-    themes = models.ManyToManyField('Theme', blank=True)
+    themes = models.ManyToManyField('Theme')
     user = models.ForeignKey(User)
     colors = models.ManyToManyField('Color')
     quantities = models.ManyToManyField('Quantity')
@@ -42,7 +42,7 @@ class Color(models.Model):
 
 class Theme(models.Model):
     name = models.CharField(max_length=30)
-    userOwner = models.ForeignKey(User)
+    userOwner = models.ForeignKey(User, blank = True, null = True)
     
     def __str__(self):
         return self.name
