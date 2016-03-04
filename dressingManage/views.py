@@ -8,6 +8,7 @@ import json, os
 from urllib.request import urlopen
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from wardrobe.settings import IMG_FOLDER
+from django.db.models import Q
 
 def accueil(request):
     return render(request, 'dressingManage/accueil.html')
@@ -66,7 +67,7 @@ def addClothe(request):
                     #newClothe.themes.add(themesC)
                     for i in themesC.split("-"):
                         try:
-                            thm = Theme.objects.get(id = int(i), userOwner=request.user)
+                            thm = Theme.objects.get(Q(id = int(i)) & (Q(userOwner=request.user) | Q(userOwner=None)))
                             newClothe.themes.add(thm)
                         except Theme.DoesNotExist:
                             data['success'] = False
@@ -189,7 +190,7 @@ def editClothe(request,idC):
                 if themesC:
                     for i in themesC.split("-"):
                         try:
-                            themes.append(Theme.objects.get(id = int(i), userOwner=request.user))
+                            themes.append(Theme.objects.get(Q(id = int(i)) & (Q(userOwner=request.user) | Q(userOwner=None)))
                         except Theme.DoesNotExist:
                             data['success'] = False
                             data['message'] = 'Un des thèmes n\'existe pas.'
