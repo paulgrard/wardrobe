@@ -107,7 +107,7 @@ USE_TZ = True
 import os
 settings_dir = os.path.dirname(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-IMG_FOLDER = os.path.join(PROJECT_ROOT, 'img\\')
+IMG_FOLDER = os.path.join(PROJECT_ROOT, 'static/img/')
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
