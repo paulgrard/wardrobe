@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'wardrobe.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pg18$default',
+        'NAME': 'pg18$wardrobe',
         'USER': 'pg18',
         'PASSWORD': 'wardrobeimac2016',
         'HOST': 'pg18.mysql.pythonanywhere-services.com',

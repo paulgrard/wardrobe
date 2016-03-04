@@ -127,7 +127,7 @@ def addClothe(request):
         return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
-    return render(request, 'dressingManage/addClothe.html', locals())
+    #return render(request, 'dressingManage/addClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -409,16 +409,12 @@ def getThemes(request):
         for theme in themesFromUser:
             themes.append(theme.name)
             idTheme.append(theme.id)
-<<<<<<< HEAD
-
-=======
 
         themesFromNullUser = Theme.objects.filter(userOwner = None)
         for themeNull in themesFromNullUser:
             themes.append(themeNull.name)
             idTheme.append(themeNull.id)
 
->>>>>>> ff1ce98ae2e26b25d500ac3ea9cd757e5b374677
         data['themes'] = themes
         data['id'] = idTheme
 
@@ -494,12 +490,8 @@ def getColors(request, idC):
     success = False
     currentUser = request.user
     colors = []
-<<<<<<< HEAD
-
-=======
     temp = {}
 
->>>>>>> ff1ce98ae2e26b25d500ac3ea9cd757e5b374677
     if currentUser.is_authenticated():
         clothing = get_object_or_404(Clothe, id = idC, user = currentUser)
         if clothing:
@@ -507,10 +499,6 @@ def getColors(request, idC):
             quantFromClothe = clothing.quantities
 
             for c in colorsFromClothe.all():
-<<<<<<< HEAD
-                colors.append(c.code)
-
-=======
                 quanti = []
                 temp['code'] = c.code
                 for q in quantFromClothe.all():
@@ -520,8 +508,6 @@ def getColors(request, idC):
                 temp['quantity'] = quanti
 
                 colors.append(temp)
-
->>>>>>> ff1ce98ae2e26b25d500ac3ea9cd757e5b374677
             data['colors'] = colors
             success = True
 
