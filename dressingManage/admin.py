@@ -19,10 +19,15 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display   = ('name', 'warmth', 'area', 'id')
     list_filter    = ('id',)
     search_fields  = ('name', 'id', 'warmth', 'area')
+
+class ColorAdmin(admin.ModelAdmin):
+    list_display   = ('name', 'id')
+    list_filter    = ('id',)
+    search_fields  = ('name', 'id')
     
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Clothe, ClotheAdmin)
-admin.site.register(Color)
+admin.site.register(Color, ColorAdmin)
 admin.site.register(Quantity)
 admin.site.register(Theme, ThemeAdmin)
 admin.site.register(Pattern)
