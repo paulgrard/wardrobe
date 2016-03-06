@@ -1,0 +1,50 @@
+chemise manches courtes
+1
+chemise manches longues
+2
+t-shirt
+1
+débardeur
+1
+caraco
+1
+chemisier
+1
+pull
+3
+manteau
+4
+gilet
+3
+veste
+3
+robe
+3
+veste de costume
+3
+haut de pyjama
+0
+sweat
+4
+parka
+5
+sous-pull
+2
+col roulé
+4
+tunique
+2
+combinaison
+3
+combinaison haut
+5
+combinaison 1 pièce
+5
+combishort
+2
+anorak
+4
+doudoune
+4
+kway
+2

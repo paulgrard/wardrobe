@@ -20,12 +20,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'xy$3)(117m#gg(o^y)q&#tsi16)fg43ch3u%x8o!d^l=&8)xl%'
+SECRET_KEY = '#1wh+%kdpl4ox41uv#e602xudqnq=b+v5f$kr%a4+pm($0yl@s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://pg18.pythonanywhere.com', '.pg18.pythonanywhere.com']
 
 
 # Application definition
@@ -79,8 +79,11 @@ WSGI_APPLICATION = 'wardrobe.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'pg18$wardrobe',
+        'USER': 'pg18',
+        'PASSWORD': 'wardrobeimac2016',
+        'HOST': 'pg18.mysql.pythonanywhere-services.com',
     }
 }
 
@@ -104,12 +107,9 @@ USE_TZ = True
 import os
 settings_dir = os.path.dirname(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-IMG_FOLDER = os.path.join(PROJECT_ROOT, 'static\\img\\')
+IMG_FOLDER = os.path.join(PROJECT_ROOT, 'static/img/')
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    '/static/',
-]
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 LOGIN_URL = '/connection/'

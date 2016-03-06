@@ -12,7 +12,7 @@ import json
 def add(request):
     data = {}
     success = False
-    
+
     if request.method == "POST":
         form = AddForm(request.POST)
         if form.is_valid():
@@ -30,16 +30,16 @@ def add(request):
                     success = True
                 else:
                     data['message'] = 'Erreur lors de la création de l\'utilisateur.'
-                    
+
         else: #si form non valide
             data['message'] = 'Formulaire non valide.'
-            
+
     else: #si non requete POST
         form = AddForm()
         data['message'] = 'Une requête POST est nécessaire.'
 
     data['success'] = success
-    return render(request, 'userManage/add.html', locals())
+
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -47,7 +47,7 @@ def add(request):
 def deactivate(request):
     data = {}
     success = False
-    
+
     if request.user.is_authenticated():
         userToDeactivate = request.user
         if userToDeactivate.is_active:

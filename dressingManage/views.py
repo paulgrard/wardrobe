@@ -21,7 +21,7 @@ def addClothe(request):
     success = False
     themes = []
     currentUser = request.user
-    
+
     if currentUser.is_authenticated():
         if request.method == "POST":
             form = AddClotheForm(request.POST, request.FILES) #old arguments , user=request.user
@@ -38,31 +38,31 @@ def addClothe(request):
                 quantity2C = form.cleaned_data["quantity2"]
                 quantity3C = form.cleaned_data["quantity3"]
                 quantitiesC = [quantity1C]
-                
 
-            
+
+
                 newClothe = Clothe(warmth = warmthC, state = 0, nbreUse = 0, category = categoryC, user = currentUser)
                 newClothe.save()
 
                 photoName = str(newClothe.pk) + '.jpg'
-                
+
                 with open(IMG_FOLDER + photoName , 'wb+') as destination:
                     for chunk in request.FILES['photo'].chunks():
                         destination.write(chunk)
 
                 newClothe.photo = photoName
                 newClothe.save()
-                
+
                 if color2C and quantity2C:
                     if not quantity2C == 0:
                         colorsC.append(color2C)
                         quantitiesC.append(quantity2C)
-                       
+
                 if color3C and quantity3C:
                     if not quantity3C == 0:
                         colorsC.append(color3C)
                         quantitiesC.append(quantity3C)
-                
+
                 if themesC:
                     #newClothe.themes.add(themesC)
                     for i in themesC.split("-"):
@@ -72,14 +72,14 @@ def addClothe(request):
                         except Theme.DoesNotExist:
                             data['success'] = False
                             data['message'] = 'Un des thèmes n\'existe pas.'
-                    
+
                             return HttpResponse(json.dumps(data), content_type='application/json')
-                    
+
                 #for valColor in colorsC:
                 if len(colorsC)>3 or len(quantitiesC)>3:
                     data['success'] = False
                     data['message'] = 'Plus de 3 couleurs ou 3 quantitées passées en paramètres.'
-                    
+
                     return HttpResponse(json.dumps(data), content_type='application/json')
 
                 else:
@@ -89,28 +89,28 @@ def addClothe(request):
                             indice = colorsC.index(c)
                             newQuantity = Quantity(quantity = quantitiesC[indice], color = colorAlrdyExist)
                             newQuantity.save()
-                            
+
                             newClothe.colors.add(colorAlrdyExist)
                             newClothe.quantities.add(newQuantity)
-                            
+
                         except Color.DoesNotExist:
                             '''col = Color(color = c)
                             col.save()
                             newClothe.colors.add(col)'''
                             data['success'] = False
                             data['message'] = 'Une des couleurs n\'existe pas.'
-                
+
                 if newClothe:
                     success = True
                 else:
                     data['message'] = 'Erreur lors de la création du vêtement.'
-                        
-                
+
+
 
             else: # si form non valide
                 data['message'] = 'Formulaire non valide.'
-                
-            
+
+
             #return HttpResponse(json.dumps(data), content_type='application/json')
 
         else: #si non post
@@ -121,9 +121,9 @@ def addClothe(request):
             else:
                 return HttpResponseForbidden('Utilisateur non authentifié')
             ####################
-            
+
             data['message'] = 'Une requête POST est nécessaire.'
-            
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
 
@@ -157,8 +157,8 @@ def editClothe(request,idC):
                 quantity2C = form.cleaned_data["quantity2"]
                 quantity3C = form.cleaned_data["quantity3"]
                 quantitiesC = []
-                
-                
+
+
                 cloth = get_object_or_404(Clothe, id = idC, user=currentUser)
 
                 if categoryC and areaC:
@@ -173,19 +173,19 @@ def editClothe(request,idC):
                     catArea = cloth.category.area
                     cat = get_object_or_404(Category, pk = categoryC, area = catArea)
                     cloth.category = cat
-                    
+
                 if warmthC:
                     cloth.warmth = warmthC
-                    
+
 
                 if form.cleaned_data['photo']:
                     photoName = str(cloth.pk) + '.jpg'
                     os.remove(IMG_FOLDER + photoName)
-                
+
                     with open(IMG_FOLDER + photoName , 'wb+') as destination:
                         for chunk in request.FILES['photo'].chunks():
                             destination.write(chunk)
-                        
+
 
                 if themesC:
                     for i in themesC.split("-"):
@@ -194,7 +194,7 @@ def editClothe(request,idC):
                         except Theme.DoesNotExist:
                             data['success'] = False
                             data['message'] = 'Un des thèmes n\'existe pas.'
-                    
+
                             return HttpResponse(json.dumps(data), content_type='application/json')
                     cloth.themes.set(themes)
 
@@ -206,12 +206,12 @@ def editClothe(request,idC):
                     quantitiesC.append(quantity2C)
                     colorsC.append(color3C)
                     quantitiesC.append(quantity3C)
-                    
+
                     #récupère les anciennes quantités et les supprime de la BDD
                     oldQuant = cloth.quantities
                     for q in oldQuant.all():
                         q.delete()
-                        
+
 
                     #création des nouvelles couleurs et quantités
                     for c in colorsC:
@@ -223,20 +223,20 @@ def editClothe(request,idC):
                             newQuantity.save()
 
                             quantitiesToPut.append(newQuantity)
-                            
+
                         except Color.DoesNotExist:
                             data['success'] = False
                             data['message'] = 'Une des couleurs n\'existe pas.'
                     cloth.colors.set(colorAlrdyExist)
                     cloth.quantities.set(quantitiesToPut)
-                        
+
                 cloth.save()
-                
+
 
             else: # si form non valide
                 data['message'] = 'Formulaire non valide.'
-                
-            
+
+
             #return HttpResponse(json.dumps(data), content_type='application/json')
 
         else: #si non post
@@ -249,7 +249,7 @@ def editClothe(request,idC):
             ####################
             success = False
             data['message'] = 'Une requête POST est nécessaire.'
-            
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
 
@@ -262,19 +262,19 @@ def getAllClothes(request):
     data = {}
     success = False
     clothes = []
-    pKey = []   
-    
-    
+    pKey = []
+
+
     currentUser = request.user
     if currentUser.is_authenticated():
         clothesFromUser = Clothe.objects.filter(user = currentUser)
         for clothe in clothesFromUser:
             themes = []
             colors = []
-            
+
             temp = {}
             categ = get_object_or_404(Category, name = clothe.category.name)
-            
+
 
             temp['warmth'] = clothe.warmth
             temp['photo'] = clothe.photo
@@ -286,23 +286,23 @@ def getAllClothes(request):
             for t in clothe.themes.all():
                 themes.append(str(t))
             temp['themes'] = themes
-            
+
             for c in clothe.colors.all():
                 info_colors = {}
                 for q in clothe.quantities.all():
-                    
+
                     if q.color == c:
                         info_colors['code'] = str(c.code)
                         info_colors['quantity'] = q.quantity
                 colors.append(info_colors)
-                
+
             temp['colors'] = colors
             temp['id'] = clothe.pk
 
 
 
 
-            
+
             pKey.append(temp)
             #pKey.append(clothe.pk)
         data['clothes'] = pKey
@@ -349,7 +349,7 @@ def addTheme(request):
             if form.is_valid():
                 nameT = form.cleaned_data["name"]
 
-                
+
                 themesFromUser = Theme.objects.filter(userOwner = currentUser)
                 for theme in themesFromUser:
                     if theme.name == nameT:
@@ -357,16 +357,16 @@ def addTheme(request):
                         data['success'] = success
                         return HttpResponse(json.dumps(data), content_type='application/json')
 
-                
+
                 newTheme = Theme(name = nameT, userOwner = currentUser)
                 newTheme.save()
-                    
+
                 '''yolo=newClothe.colors.all()
                 for x in yolo:
                     yolo2 = x.color
                 data = {'new_clothe':yolo2}
                 return HttpResponse(json.dumps(data), content_type='application/json')'''
-                    
+
                 if newTheme:
                     success = True
                 else:
@@ -374,8 +374,8 @@ def addTheme(request):
 
             else: # si form non valide
                 data['message'] = 'Formulaire non valide.'
-                
-            
+
+
             #return HttpResponse(json.dumps(data), content_type='application/json')
 
         else: #si non post
@@ -386,9 +386,9 @@ def addTheme(request):
             else:
                 return HttpResponseForbidden('Utilisateur non authentifié')
             ####################
-            
+
             data['message'] = 'Une requête POST est nécessaire.'
-            
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
 
@@ -404,27 +404,27 @@ def getThemes(request):
     themes = []
     idTheme = []
     currentUser = request.user
-    
+
     if currentUser.is_authenticated():
         themesFromUser = Theme.objects.filter(userOwner = currentUser)
         for theme in themesFromUser:
             themes.append(theme.name)
             idTheme.append(theme.id)
-            
+
         themesFromNullUser = Theme.objects.filter(userOwner = None)
         for themeNull in themesFromNullUser:
             themes.append(themeNull.name)
             idTheme.append(themeNull.id)
-            
+
         data['themes'] = themes
         data['id'] = idTheme
-        
+
         success = True
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
-        
+
     data['success'] = success
-    
+
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -432,21 +432,21 @@ def getTheme(request):
     data = {}
     success = False
     currentUser = request.user
-    
+
     if currentUser.is_authenticated():
         if request.method == "POST":
             form = GetThemeForm(request.POST)
             if form.is_valid():
                 nameT = form.cleaned_data["name"]
-                
+
                 theme = get_object_or_404(Theme, name = nameT, userOwner = currentUser)
                 data['theme'] = theme.id
                 success = True
-                
+
             else: # si form non valide
                 data['message'] = 'Formulaire non valide.'
 
-                
+
         else: #si non post
 
             ####################
@@ -455,34 +455,34 @@ def getTheme(request):
             else:
                 return HttpResponseForbidden('Utilisateur non authentifié')
             ####################
-            
+
             data['message'] = 'Une requête POST est nécessaire.'
 
 
-            
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
-        
+
     data['success'] = success
-    
+
     #return render(request, 'dressingManage/getTheme.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
-    
+
 def deleteTheme(request, idT):
     data = {}
     success = False
     currentUser = request.user
-    
+
     if currentUser.is_authenticated():
         themeToDel = get_object_or_404(Theme, id = idT, userOwner = currentUser)
 
         themeToDel.delete()
         success = True
         data['success'] = success
-        
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
-    
+
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -492,13 +492,13 @@ def getColors(request, idC):
     currentUser = request.user
     colors = []
     temp = {}
-    
+
     if currentUser.is_authenticated():
         clothing = get_object_or_404(Clothe, id = idC, user = currentUser)
         if clothing:
             colorsFromClothe = clothing.colors
             quantFromClothe = clothing.quantities
-            
+
             for c in colorsFromClothe.all():
                 quanti = []
                 temp['code'] = c.code
@@ -507,20 +507,19 @@ def getColors(request, idC):
                     quanti.append(quant.quantity)
 
                 temp['quantity'] = quanti
-                
+
                 colors.append(temp)
-            
             data['colors'] = colors
             success = True
-        
+
         else:
             data['message'] = "Vêtement non trouvé."
-            
+
         data['success'] = success
-        
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
-    
+
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -530,24 +529,24 @@ def getAllColors(request):
     success = False
     currentUser = request.user
     colors = []
-    
+
     if currentUser.is_authenticated():
         col = Color.objects.all()
         if col:
             for c in col.all():
                 colors.append(c.code)
-            
+
             data['colors'] = colors
             success = True
-        
+
         else:
             data['message'] = "Erreur lors de la requête."
-            
+
         data['success'] = success
-        
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
-    
+
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -561,13 +560,13 @@ def getPicture(request, idC):
         clothing = get_object_or_404(Clothe, id = idC, user = currentUser)
         if clothing:
             pict = clothing.photo
-            
+
             image_data = open(IMG_FOLDER+pict, "rb").read()
             success = True
             return HttpResponse(image_data, content_type="image/jpeg")
         else:
             data['message'] = "Erreur lors de la création du vêtement."
-        
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
 
@@ -594,7 +593,7 @@ def getWeather(request):
                 success = True
             else: # si form non valide
                 data['message'] = 'Formulaire non valide.'
-                
+
         else: #si non post
 
             ####################
@@ -604,10 +603,10 @@ def getWeather(request):
             else:
                 return HttpResponseForbidden('Utilisateur non authentifié')
             ####################
-            
+
             data['message'] = 'Une requête POST est nécessaire.'
 
-            
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
 
@@ -624,7 +623,7 @@ def getCategoriesFromArea(request,idA):
     success = False
     currentUser = request.user
     if currentUser.is_authenticated():
-        
+
         cats = Category.objects.filter(area = idA)
         for c in cats:
             cat = {}
@@ -633,7 +632,7 @@ def getCategoriesFromArea(request,idA):
             temp.append(cat)
         data["categories"] = temp
         success = True
-        
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
 
@@ -645,13 +644,13 @@ def changeState(request, idC, state):
     data = {}
     success = False
     currentUser = request.user
-    
+
     if currentUser.is_authenticated():
         cloth = Clothe.objects.get(id = idC, user=currentUser)
         cloth.state = state
         cloth.save()
         success = True
-        
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
 

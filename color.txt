@@ -1,0 +1,48 @@
+Blanc
+#FFFFFF
+Noir
+#000000
+Rouge
+#FF0000
+Pourpre
+#9E0E40
+Violet
+#660099
+Indigo
+#791CF8
+Bleu
+#0000FF
+Turquoise
+#25FDE9
+Vert
+#00FF00
+Vert pomme
+#34C924
+Jaune
+#FFFF00
+Ocre
+#DFAF2C
+Orange
+#ED7F10
+Vert bouteille
+#096A09
+Rose
+#FD6C9E
+Marron
+#582900
+Gris clair
+#CECECE
+Gris
+#606060
+Beige
+#C8AD7F
+Kaki
+#94812B
+Rouge carmin
+#960018
+Saumon
+#F88E55
+Ivoire
+#FFFFD4
+Emeraude
+#01D758

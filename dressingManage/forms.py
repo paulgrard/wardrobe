@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
@@ -11,14 +12,7 @@ from django.core.exceptions import ValidationError
     
 class AddClotheForm(forms.Form):
         
-    '''def __init__(self, *args, **kwargs):
-        currentUser = kwargs.pop('user')
-        super(AddClotheForm, self).__init__(*args, **kwargs)
-        
-        self.fields['themes'].queryset = Theme.objects.filter(userOwner = currentUser) 
-        #self.fields['themes']=forms.ModelChoiceField(queryset = Theme.objects.filter(userOwner = currentUser) , required=False, widget=FilteredSelectMultiple("Thèmes du vêt", is_stacked=False), label = "Thèmes du vêtement")'''
-
-
+   
     def validate_file_extension(value):
         ext = [".jpg", ".JPG", ".jpeg", ".JPEG"]
         if not value.name.endswith(tuple(ext)):
@@ -39,8 +33,6 @@ class AddClotheForm(forms.Form):
     
     color3 = forms.CharField(label = "Couleur 3 du vêtement", max_length=7, min_length=7, required=False)
     quantity3 = forms.IntegerField(label = "Pourcentage 3 de la couleur", required=False)
-
-
 
 
 

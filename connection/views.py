@@ -10,7 +10,7 @@ import json
 def connection(request):
     success = False
     data = {}
-    
+
     if request.method == "POST":
         form = ConnectionForm(request.POST)
         if form.is_valid():
@@ -43,10 +43,10 @@ def deconnection(request):
     if request.user.is_authenticated():
         logout(request)
         data= {'success':'True'}
-        
+
         return HttpResponse(json.dumps(data), content_type='application/json')
         #return redirect(reverse(connection))
-    
+
     return HttpResponseForbidden('Utilisateur non authentifié')
 
 '''from django.contrib.auth.decorators import login_required
