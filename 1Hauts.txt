@@ -1,50 +1,75 @@
 chemise manches courtes
 1
+0
 chemise manches longues
 2
+0
 t-shirt
+1
 1
 débardeur
 1
+1
 caraco
+1
 1
 chemisier
 1
+0
 pull
 3
+2
 manteau
 4
+3
 gilet
 3
+2
 veste
+3
 3
 robe
 3
+0
 veste de costume
 3
+2
 haut de pyjama
 0
+1
 sweat
 4
+2
 parka
 5
+3
 sous-pull
 2
+1
 col roulé
 4
+2
 tunique
 2
+0
 combinaison
 3
+0
 combinaison haut
 5
+3
 combinaison 1 pièce
 5
+3
 combishort
 2
+0
 anorak
 4
+3
 doudoune
 4
+3
 kway
 2
+3
