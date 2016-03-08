@@ -706,7 +706,7 @@ def generateOutfit(request):
                 if outfitLayers == 2:
                     cSecondLayer = Clothe.objects.filter(Q(user = currentUser) & (Q(category__layer = 2) | Q(category__layer = 0))).order_by('?').first()
                 else:
-                    cSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(category__layer = 1) | Q(category__layer = 0))).order_by('?').first()
+                    cSecondLayer = Clothe.objects.filter(Q(user = currentUser) & (Q(category__layer = 1) | Q(category__layer = 0))).order_by('?').first()
 
 
                     
