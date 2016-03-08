@@ -2,9 +2,12 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import login, logout
-from userManage.forms import AddForm, forms
+from userManage.forms import AddForm, forms ,setParamForm
 from django.contrib.auth.models import User
 from userManage.models import Parameters
+
+from django.db.models import Q
+from django.contrib.auth import update_session_auth_hash
 
 import json
 
@@ -39,7 +42,7 @@ def add(request):
         data['message'] = 'Une requête POST est nécessaire.'
 
     data['success'] = success
-
+    #return render(request, 'userManage/add.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -64,17 +67,65 @@ def deactivate(request):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-def setSex(request, sexType):
+def setParameters(request):
     data={}
     success = False
 
+    user=request.user
+
     if request.user.is_authenticated():
-        param = get_object_or_404(Parameters, user = request.user)
-        param.sex = sexType
-        param.save()
-        success = True
+        if request.method == "POST":
+            form = setParamForm(request.POST)
+            if form.is_valid():
+                new_username = form.cleaned_data["username"]
+                new_mail = form.cleaned_data["mail"]
+                new_password = form.cleaned_data["password"]
+                new_sex = form.cleaned_data["sex"]
+
+                if new_username:
+                    if User.objects.filter(Q(username = new_username) & ~Q(id = user.id)).exists():
+                        data['message'] = 'Ce pseudo est déja utilisé.'
+                        data['success'] = False
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+                    else:
+                        user.username = new_username
+                        user.save()
+                        success = True
+                
+                if new_mail:
+                    if User.objects.filter(Q(email = new_mail) & ~Q(id = user.id)).exists():
+                        data['message'] = 'Ce mail est déja utilisé.'
+                        data['success'] = False
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+                    else:
+                        user.email = new_mail
+                        user.save()
+                        success = True
+
+                        
+                if new_password:
+                    user.set_password(new_password)
+                    update_session_auth_hash(request, user)
+                    user.save()
+                    
+                    success = True
+
+                if new_sex:
+                    param = get_object_or_404(Parameters, user = user)
+                    param.sex = new_sex
+                    param.save()
+                    success = True
+                    
+            else: #si form non valide
+                data['message'] = 'Formulaire non valide.'
+
+        else: #si non requete POST
+            form = setParamForm()
+            data['message'] = 'Une requête POST est nécessaire.'
+
     else:
         return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
+    #return render(request, 'userManage/setParameters.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')

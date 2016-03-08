@@ -56,4 +56,11 @@ class Pattern(models.Model):
     def __str__(self):
         return self.name
 
+class Outfit(models.Model):
+    clothes = models.ForeignKey(Clothe, blank = True, null = True)
+    wearing = models.NullBooleanField()
+
+    def __str__(self):
+        return self.clothes
+    
 
