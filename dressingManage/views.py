@@ -656,3 +656,85 @@ def changeState(request, idC, state):
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def generateOutfit(request):
+    data = {}
+    success = False
+    currentUser = request.user
+    themes = []
+    
+    if currentUser.is_authenticated():
+        if request.method == "POST":
+            form = OutfitGenerationForm(request.POST)
+            if form.is_valid():
+                lon = form.cleaned_data["lon"]
+                lat = form.cleaned_data["lat"]
+                themesC = form.cleaned_data["themes"]
+
+                # récupère weather
+                content = urlopen('http://api.openweathermap.org/data/2.5/find?lat=' + str(lat) + '&lon=' + str(lon) + '&cnt=1&appid=f7dea76625663a7ce872ba2c9c206fec').read().decode("utf-8")
+                content = json.loads(content)
+                temp = content["list"][0]["main"]["temp"]
+                temp = int(round(temp - 273.15))
+                data["temp"] = temp
+                weather = content["list"][0]["weather"][0]["main"]
+                data["weather"] = weather
+
+
+                # récupère thèmes
+                if themesC:
+                    for i in themesC.split("-"):
+                        try:
+                            thm = Theme.objects.get(Q(id = int(i)) & (Q(userOwner=request.user) | Q(userOwner=None)))
+                            newClothe.themes.add(thm)
+                        except Theme.DoesNotExist:
+                            data['success'] = False
+                            data['message'] = 'Un des thèmes n\'existe pas.'
+
+                            return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+
+                # détermine nbre couches
+                if temp >= 30:
+                    outfitLayers = 1
+                elif temp < 30:
+                    outfitLayers = 2
+
+
+                if outfitLayers == 2
+                    cSecondLayer = Clothe.objects.filter(Q(user=currentUser) & (Q(category.layer=2) | Q(category.layer=0)))order_by('?').first()
+
+                '''Thunderstorm
+                Drizzle
+                Rain
+                Snow
+                Clear
+                Clouds
+                Extreme'''
+
+
+                
+                success = True
+            else: # si form non valide
+                data['message'] = 'Formulaire non valide.'
+
+        else: #si non post
+
+            ####################
+            if currentUser.is_authenticated():
+                form = OutfitGenerationForm()
+                return render(request, 'dressingManage/getWeather.html', locals())
+            else:
+                return HttpResponseForbidden('Utilisateur non authentifié')
+            ####################
+
+            data['message'] = 'Une requête POST est nécessaire.'
+
+
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')
