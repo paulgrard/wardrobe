@@ -656,5 +656,3 @@ def changeState(request, idC, state):
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
-
-

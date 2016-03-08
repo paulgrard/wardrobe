@@ -71,3 +71,10 @@ class WeatherForm(forms.Form):
         
     lat = forms.CharField(label = "lat", max_length=20)
     lon = forms.CharField(label = "lon", max_length=20)
+
+
+class OutfitGenerationForm(forms.Form):
+        
+    lat = forms.CharField(label = "lat", max_length=20)
+    lon = forms.CharField(label = "lon", max_length=20)
+    themes = forms.CharField(label = "ID des thèmes")

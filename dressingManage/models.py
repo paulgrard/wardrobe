@@ -62,5 +62,10 @@ class Outfit(models.Model):
 
     def __str__(self):
         return self.clothes
-    
 
+class outfitStorage(models.Model):
+    clothes = models.ForeignKey(Clothe, blank = True, null = True)
+    userOwner = models.OneToOneField(User, blank = True, null = True)
+
+    def __str__(self):
+        return self.userOwner.name
