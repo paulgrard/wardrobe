@@ -51,7 +51,7 @@ class Theme(models.Model):
 
 class Pattern(models.Model):
     name = models.CharField(max_length=30)
-    color = models.ManyToManyField(Color)
+    colors = models.ManyToManyField(Color)
         
     def __str__(self):
         return self.name

@@ -3,12 +3,13 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms, WeatherForm, EditClotheForm, OutfitGenerationForm
 from django.contrib.auth.models import User
-from dressingManage.models import Clothe, Category, Color, Theme, Quantity
+from dressingManage.models import Clothe, Category, Color, Theme, Quantity, Pattern
 import json, os
 from urllib.request import urlopen
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from wardrobe.settings import IMG_FOLDER
 from django.db.models import Q
+import random
 
 def accueil(request):
     return render(request, 'dressingManage/accueil.html')
@@ -658,11 +659,14 @@ def changeState(request, idC, state):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
+from collections import Counter
+
+
 def generateOutfit(request):
     data = {}
     success = False
     currentUser = request.user
-    themes = []
+    lCoulIds = []
     
     if currentUser.is_authenticated():
         if request.method == "POST":
@@ -684,31 +688,90 @@ def generateOutfit(request):
 
                 # récupère thèmes
                 if themesC:
-                    for i in themesC.split("-"):
-                        try:
-                            thm = Theme.objects.get(Q(id = int(i)) & (Q(userOwner=request.user) | Q(userOwner=None)))
-                            newClothe.themes.add(thm)
-                        except Theme.DoesNotExist:
-                            data['success'] = False
-                            data['message'] = 'Un des thèmes n\'existe pas.'
+                    try:
+                        thm = Theme.objects.get(Q(id = themesC) & (Q(userOwner=request.user) | Q(userOwner=None)))
+                    except Theme.DoesNotExist:
+                        data['success'] = False
+                        data['message'] = 'Un des thèmes n\'existe pas.'
 
-                            return HttpResponse(json.dumps(data), content_type='application/json')
+                        return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 
                 # détermine nbre couches
-                if temp >= 30:
+                if temp >= 21:
                     outfitLayers = 1
-                elif temp < 30:
+                elif temp < 21:
                     outfitLayers = 2
 
 
+                # choisir le vêtement de la seconde couche
                 if outfitLayers == 2:
-                    cSecondLayer = Clothe.objects.filter(Q(user = currentUser) & (Q(category__layer = 2) | Q(category__layer = 0))).order_by('?').first()
-                else:
-                    cSecondLayer = Clothe.objects.filter(Q(user = currentUser) & (Q(category__layer = 1) | Q(category__layer = 0))).order_by('?').first()
+                    lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & (Q(category__layer = 2) | Q(category__layer = 0))).order_by('?')
 
-                data['clothes'] = cSecondLayer
+                    if lSecondLayer:
+                        for c in lSecondLayer:
+                            lSecondLayerIds = c.id  # crée la liste d'ids de vêtements possibles
+                            
+                        SecondLayer = random.choice(lSecondLayer)
+                        SecondLayerId = SecondLayer.id
+                        data['clothesS'] = SecondLayerId
+
+                        # crée la liste des couleurs
+                        lCoul = SecondLayer.colors
+                        for c in lCoul.all():
+                            if c.id == 1 or c.id == 2: # si noir ou blanc 
+                                if len(lCoulIds) == 0: # et si liste vide on ajoute tout
+                                    lCoulIds = list(range(1, 25))
+                                else: # et si liste déja remplie on ajoute tout et on garde seulement les doublons
+                                    lCoulIds = lCoulIds + list(range(1, 25))
+                                    counts = Counter(lCoulIds)
+                                    lCoulIds = [value for value, count in counts.items() if count > 1]
+                            else: #si pas noir ni blc
+                                pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
+                                if len(lCoulIds) == 0: # si liste vide on ajoute les couleurs
+                                    for col in pat.colors.all():
+                                        lCoulIds.append(col.id)
+                                else: # sinon on ajoute les couleurs et on garde seulement les doublons
+                                    for col in pat.colors.all():
+                                        lCoulIds.append(col.id)
+                                    counts = Counter(lCoulIds)
+                                    lCoulIds = [value for value, count in counts.items() if count > 1]
+
+                        lCoulIds.append(1) # on ajoute le blanc et le noir qui sont compatible avec tout
+                        lCoulIds.append(2)
+                        lCoulIds = list(set(lCoulIds))
+                        data['lCoulIds'] = lCoulIds   
+                    else:
+                        SecondLayer = -1
+                        data['clothesS'] = SecondLayer
+
+
+                    # choisir le vêtement de la 1ere couche
+                    
+                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(colors__id__in = lCoulIds) & (Q(category__layer = 1) | Q(category__layer = 0))).order_by('?')
+
+                    if lFirstLayer:
+                        for c in lFirstLayer:
+                            lFirstLayerIds = c.id
+
+                        FirstLayer = random.choice(lFirstLayer)
+
+                        FirstLayerId = FirstLayer.id
+                        data['clothe'] = FirstLayerId
+                    else:
+                        FirstLayer = -1
+                        data['clothe'] = FirstLayer
+
+
+
+                        
+                # choisir le vêtement de la 1ere couche
+                else:
+                    cFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & (Q(category__layer = 1) | Q(category__layer = 0))).order_by('?').first()
+
+                
+                
                     
                 '''Thunderstorm
                 Drizzle
