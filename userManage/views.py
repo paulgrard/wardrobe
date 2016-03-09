@@ -129,3 +129,21 @@ def setParameters(request):
     data['success'] = success
     #return render(request, 'userManage/setParameters.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def getParameters(request):
+    data={}
+    success = False
+    user=request.user
+
+    if request.user.is_authenticated():
+        data['mail'] = user.email
+        data['name'] = user.username
+        param = get_object_or_404(Parameters, user = user)
+        data['sex'] = param.sex
+        success = True
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')
