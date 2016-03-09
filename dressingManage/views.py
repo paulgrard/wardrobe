@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden, Http404
-from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms, WeatherForm, EditClotheForm
+from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms, WeatherForm, EditClotheForm, OutfitGenerationForm
 from django.contrib.auth.models import User
 from dressingManage.models import Clothe, Category, Color, Theme, Quantity
 import json, os
@@ -708,7 +708,7 @@ def generateOutfit(request):
                 else:
                     cSecondLayer = Clothe.objects.filter(Q(user = currentUser) & (Q(category__layer = 1) | Q(category__layer = 0))).order_by('?').first()
 
-
+                data['clothes'] = cSecondLayer
                     
                 '''Thunderstorm
                 Drizzle
@@ -727,11 +727,8 @@ def generateOutfit(request):
         else: #si non post
 
             ####################
-            if currentUser.is_authenticated():
-                form = OutfitGenerationForm()
-                return render(request, 'dressingManage/getWeather.html', locals())
-            else:
-                return HttpResponseForbidden('Utilisateur non authentifié')
+            form = OutfitGenerationForm()
+            return render(request, 'dressingManage/generateOutfit.html', locals())
             ####################
 
             data['message'] = 'Une requête POST est nécessaire.'

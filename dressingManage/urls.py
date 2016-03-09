@@ -18,4 +18,6 @@ urlpatterns = [
     url(r'^getWeather$', views.getWeather, name='getWeather'),
     url(r'^getCategoriesFromArea/(?P<idA>\d+)$', views.getCategoriesFromArea, name='getCategoriesFromArea'),
     url(r'^changeState/(?P<idC>\d+)/(?P<state>\d+)$', views.changeState, name='changeState'),
+    url(r'^changeState/(?P<idC>\d+)/(?P<state>\d+)$', views.changeState, name='changeState'),
+    url(r'^generateOutfit/$', views.generateOutfit, name='generateOutfit'),
 ]
