@@ -702,10 +702,83 @@ def generateOutfit(request):
                 # détermine nbre couches
                 if temp >= 21:
                     outfitLayers = 1
-                elif temp < 21:
+                else:
                     outfitLayers = 2
 
 
+                if temp > 30:
+                    ptsTop = 2
+                    ptsLow = 2
+                    ptsCoat = 0
+                    ptsShoes = 2
+                    ptsVarious = 2
+                    
+                if temp in range(30, 25): 
+                    ptsTop = 3
+                    ptsLow = 3
+                    ptsCoat = 0
+                    ptsShoes = 3
+                    ptsVarious = 3
+                    
+                if temp in range(25, 20):
+                    ptsTop = 4
+                    ptsLow = 4
+                    ptsCoat = 4
+                    ptsShoes = 4
+                    ptsVarious = 4
+                    
+                if temp in range(20, 15):
+                    ptsTop = 8
+                    ptsLow = 6
+                    ptsCoat = 7
+                    ptsShoes = 5
+                    ptsVarious = 5
+                    
+                if temp in range(15, 10):
+                    ptsTop = 14
+                    ptsLow = 7
+                    ptsCoat = 10
+                    ptsShoes = 7
+                    ptsVarious = 9
+                    
+                if temp in range(10, 5):
+                    ptsTop = 16
+                    ptsLow = 8
+                    ptsCoat = 14
+                    ptsShoes = 10
+                    ptsVarious = 18
+                    
+                if  temp in range(5, 0):
+                    ptsTop = 18
+                    ptsLow = 9
+                    ptsCoat = 17
+                    ptsShoes = 12
+                    ptsVarious = 26
+                    
+                if temp in range(0, -5):
+                    ptsTop = 20
+                    ptsLow = 9
+                    ptsCoat = 18
+                    ptsShoes = 13
+                    ptsVarious = 31
+                    
+                if  temp in range(-5, -10):
+                    ptsTop = 22
+                    ptsLow = 9
+                    ptsCoat = 19
+                    ptsShoes = 14
+                    ptsVarious = 33
+                    
+                if temp <= -10:
+                    ptsTop = 24
+                    ptsLow = 9
+                    ptsCoat = 20
+                    ptsShoes = 15
+                    ptsVarious = 35
+                    
+                
+                    
+                
                 # choisir le vêtement de la seconde couche
                 if outfitLayers == 2:
                     #if temp>30 t= 1, if temp<30 and >20 t=3 etc et faire query en fonction des t
