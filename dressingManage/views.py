@@ -679,12 +679,19 @@ def generateOutfit(request):
                 themesC = form.cleaned_data["themes"]
 
                 # récupère weather
-                content = urlopen('http://api.openweathermap.org/data/2.5/find?lat=' + str(lat) + '&lon=' + str(lon) + '&cnt=1&appid=f7dea76625663a7ce872ba2c9c206fec').read().decode("utf-8")
+                #content = urlopen('http://api.openweathermap.org/data/2.5/find?lat=' + str(lat) + '&lon=' + str(lon) + '&cnt=1&appid=f7dea76625663a7ce872ba2c9c206fec').read().decode("utf-8")
+                content = urlopen('http://api.openweathermap.org/data/2.5/forecast/daily?lat=' + str(lat) + '&lon=' + str(lon) + '&cnt=1&appid=f7dea76625663a7ce872ba2c9c206fec').read().decode("utf-8")
                 content = json.loads(content)
-                temp = content["list"][0]["main"]["temp"]
+                #temp = content["list"][0]["main"]["temp"]
+                tempD = content["list"][0]["temp"]["day"]
+                tempE = content["list"][0]["temp"]["eve"]
+                tempM = content["list"][0]["temp"]["morn"]
+                temp = ( tempD + tempE + tempM )/3
                 temp = int(round(temp - 273.15))
                 data["temp"] = temp
                 weather = content["list"][0]["weather"][0]["main"]
+                weatherDescription = content["list"][0]["weather"][0]["description"]
+                #"light rain"
                 data["weather"] = weather
 
 
@@ -705,6 +712,12 @@ def generateOutfit(request):
                 else:
                     outfitLayers = 2
 
+                ptsTop = 0
+                ptsLow = 0
+                ptsCoat = 0
+                ptsShoes = 0
+                ptsVarious = 0
+                    
 
                 if temp > 30:
                     ptsTop = 2
@@ -713,56 +726,56 @@ def generateOutfit(request):
                     ptsShoes = 2
                     ptsVarious = 2
                     
-                if temp in range(30, 25): 
+                if temp in range(25, 30): 
                     ptsTop = 3
                     ptsLow = 3
                     ptsCoat = 0
                     ptsShoes = 3
                     ptsVarious = 3
                     
-                if temp in range(25, 20):
+                if temp in range(20, 25):
                     ptsTop = 4
                     ptsLow = 4
                     ptsCoat = 4
                     ptsShoes = 4
                     ptsVarious = 4
                     
-                if temp in range(20, 15):
+                if temp in range(15, 20):
                     ptsTop = 8
                     ptsLow = 6
                     ptsCoat = 7
                     ptsShoes = 5
                     ptsVarious = 5
                     
-                if temp in range(15, 10):
+                if temp in range(10, 15):
                     ptsTop = 14
                     ptsLow = 7
                     ptsCoat = 10
                     ptsShoes = 7
                     ptsVarious = 9
                     
-                if temp in range(10, 5):
+                if temp in range(5, 10):
                     ptsTop = 16
                     ptsLow = 8
                     ptsCoat = 14
                     ptsShoes = 10
                     ptsVarious = 18
                     
-                if  temp in range(5, 0):
+                if  temp in range(0, 5):
                     ptsTop = 18
                     ptsLow = 9
                     ptsCoat = 17
                     ptsShoes = 12
                     ptsVarious = 26
                     
-                if temp in range(0, -5):
+                if temp in range(-5, 0):
                     ptsTop = 20
                     ptsLow = 9
                     ptsCoat = 18
                     ptsShoes = 13
                     ptsVarious = 31
                     
-                if  temp in range(-5, -10):
+                if  temp in range(-10, -5):
                     ptsTop = 22
                     ptsLow = 9
                     ptsCoat = 19
@@ -781,42 +794,54 @@ def generateOutfit(request):
                 
                 # choisir le vêtement de la seconde couche
                 if outfitLayers == 2:
-                    #if temp>30 t= 1, if temp<30 and >20 t=3 etc et faire query en fonction des t
-                    lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & (Q(category__layer = 2) | Q(category__layer = 0))).order_by('?')
 
+                    ptsFirst = int(ptsTop/3)
+                    ptsSecond = ptsTop - ptsFirst
+                                                        #appartient au user     est dans le theme        appartient à la couche 2 ou 0
+                    lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & (Q(category__layer = 2) | Q(category__layer = 0)))
+                    
                     if lSecondLayer:
                         for c in lSecondLayer:
-                            lSecondLayerIds.append(c.id)  # crée la liste d'ids de vêtements possibles
+                            #cat = Category.objects.get(id = c.category.id) # on récupère la catégorie et on calcule les points totaux des warmth de la cat et du vêt
+                            warmthTot = c.category.warmth * c.warmth
+                            if (warmthTot >= (ptsSecond-1)) and (warmthTot <= (ptsSecond+1)): #si les points totaux sont +-1 de ptsSecond, on ajout le vêt à la liste
+                                lSecondLayerIds.append(c.id)  # crée la liste d'ids de vêtements possibles
+                        
+                        
+                        if len(lSecondLayerIds) == 0:
+                            SecondLayer = -1
+                            data['2nd'] = SecondLayer
+                        else:
+                            SecondLayer = Clothe.objects.get(id = random.choice(lSecondLayerIds))
+                            data['2nd'] = SecondLayer.id
+                            #SecondLayerId = SecondLayer.id
                             
-                        SecondLayer = random.choice(lSecondLayer)
-                        SecondLayerId = SecondLayer.id
-                        data['2nd'] = SecondLayerId
 
-                        # crée la liste des couleurs
-                        lCoul = SecondLayer.colors
-                        for c in lCoul.all():
-                            if c.id == 1 or c.id == 2: # si noir ou blanc 
-                                if len(lCoulIds) == 0: # et si liste vide on ajoute tout
-                                    lCoulIds = list(range(1, 25))
-                                else: # et si liste déja remplie on ajoute tout et on garde seulement les doublons
-                                    lCoulIds = lCoulIds + list(range(1, 25))
-                                    counts = Counter(lCoulIds)
-                                    lCoulIds = [value for value, count in counts.items() if count > 1]
-                            else: #si pas noir ni blc
-                                pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
-                                if len(lCoulIds) == 0: # si liste vide on ajoute les couleurs
-                                    for col in pat.colors.all():
-                                        lCoulIds.append(col.id)
-                                else: # sinon on ajoute les couleurs et on garde seulement les doublons
-                                    for col in pat.colors.all():
-                                        lCoulIds.append(col.id)
-                                    counts = Counter(lCoulIds)
-                                    lCoulIds = [value for value, count in counts.items() if count > 1]
+                            # crée la liste des couleurs
+                            lCoul = SecondLayer.colors
+                            for c in lCoul.all():
+                                if c.id == 1 or c.id == 2: # si noir ou blanc 
+                                    if len(lCoulIds) == 0: # et si liste vide on ajoute tout
+                                        lCoulIds = list(range(1, 25))
+                                    '''else: # et si liste déja remplie on ajoute tout et on garde seulement les doublons           !!!!!!!!!!!!! ne sert à rien !!!
+                                        lCoulIds = lCoulIds + list(range(1, 25))
+                                        counts = Counter(lCoulIds)
+                                        lCoulIds = [value for value, count in counts.items() if count > 1]'''
+                                else: #si pas noir ni blc
+                                    pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
+                                    if len(lCoulIds) == 0: # si liste vide on ajoute les couleurs
+                                        for col in pat.colors.all():
+                                            lCoulIds.append(col.id)
+                                    else: # sinon on ajoute les couleurs et on garde seulement les doublons
+                                        for col in pat.colors.all():
+                                            lCoulIds.append(col.id)
+                                        counts = Counter(lCoulIds)
+                                        lCoulIds = [value for value, count in counts.items() if count > 1]
 
-                        lCoulIds.append(1) # on ajoute le blanc et le noir qui sont compatible avec tout
-                        lCoulIds.append(2)
-                        lCoulIds = list(set(lCoulIds))
-                        data['lCoulIds'] = lCoulIds   
+                            lCoulIds.append(1) # on ajoute le blanc et le noir qui sont compatible avec tout
+                            lCoulIds.append(2)
+                            lCoulIds = list(set(lCoulIds))
+                               
                     else:
                         SecondLayer = -1
                         data['2nd'] = SecondLayer
@@ -827,34 +852,42 @@ def generateOutfit(request):
 
                     # choisir le vêtement de la 1ere couche (si 2eme couche)
                     
-                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(colors__id__in = lCoulIds) & (Q(category__layer = 1) | Q(category__layer = 0))).order_by('?')
+                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(colors__id__in = lCoulIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
 
                     if lFirstLayer:
                         for c in lFirstLayer:
-                            lFirstLayerIds = c.id
+                            #cat = Category.objects.get(id = c.category.id) # on récupère la catégorie et on calcule les points totaux des warmth de la cat et du vêt
+                            warmthTot = c.category.warmth * c.warmth
+                            if (warmthTot >= (ptsFirst-1)) and (warmthTot <= (ptsFirst+1)):
+                                lFirstLayerIds.append(c.id)
 
-                        FirstLayer = random.choice(lFirstLayer)
 
-                        lCoul = FirstLayer.colors
+                        if len(lFirstLayerIds) == 0:
+                            FirstLayer = -1
+                            data['1st'] = FirstLayer
+                        else:
+                            FirstLayer = Clothe.objects.get(id = random.choice(lFirstLayerIds))
 
-                        for c in lCoul.all():
-                            if c.id == 1:
-                                lCoulIds.append(1) 
-                            if c.id == 2:
-                                lCoulIds.append(2)
+                            lCoul = FirstLayer.colors
 
-                            lCoulIds = list(set(lCoulIds))
-                            
-                            if c.id!= 1 and c.id!=2: #si pas blc ni noir
-                                pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
-                                for col in pat.colors.all(): # on ajoute les couleurs
-                                    lCoulIds.append(col.id)
-                                counts = Counter(lCoulIds) #et on garde que les doublons
-                                lCoulIds = [value for value, count in counts.items() if count > 1]
+                            for c in lCoul.all():
+                                if c.id == 1:
+                                    lCoulIds.append(1) 
+                                if c.id == 2:
+                                    lCoulIds.append(2)
 
-                        
-                        FirstLayerId = FirstLayer.id
-                        data['1st'] = FirstLayerId
+                                lCoulIds = list(set(lCoulIds))
+                                
+                                if c.id!= 1 and c.id!=2: #si pas blc ni noir
+                                    pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
+                                    for col in pat.colors.all(): # on ajoute les couleurs
+                                        lCoulIds.append(col.id)
+                                    counts = Counter(lCoulIds) #et on garde que les doublons
+                                    lCoulIds = [value for value, count in counts.items() if count > 1]
+
+                            data['lCoulIds'] = lCoulIds
+                            FirstLayerId = FirstLayer.id
+                            data['1st'] = FirstLayerId
                     else:
                         FirstLayer = -1
                         data['1st'] = FirstLayer
@@ -866,41 +899,48 @@ def generateOutfit(request):
                 else:
                     SecondLayer = -1
                     data['2nd'] = SecondLayer
-                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & (Q(category__layer = 1) | Q(category__layer = 0))).order_by('?')
+                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & (Q(category__layer = 1) | Q(category__layer = 0)))
 
                     if lFirstLayer:
                         for c in lFirstLayer:
-                            lFirstLayerIds.append(c.id)  # crée la liste d'ids de vêtements possibles
-                            
-                        FirstLayer = random.choice(lFirstLayer)
-                        FirstLayerId = FirstLayer.id
-                        data['1st'] = FirstLayerId
+                            cat = Category.objects.get(id = c.category.id) # on récupère la catégorie et on calcule les points totaux des warmth de la cat et du vêt
+                            warmthTot = c.category.warmth * c.warmth
+                            if (warmthTot >= (ptsFirst-1)) and (warmthTot <= (ptsFirst+1)):
+                                lFirstLayerIds.append(c.id)  # crée la liste d'ids de vêtements possibles
 
-                        # crée la liste des couleurs
-                        lCoul = FirstLayer.colors
-                        for c in lCoul.all():
-                            if c.id == 1 or c.id == 2: # si noir ou blanc 
-                                if len(lCoulIds) == 0: # et si liste vide on ajoute tout
-                                    lCoulIds = list(range(1, 25))
-                                else: # et si liste déja remplie on ajoute tout et on garde seulement les doublons
-                                    lCoulIds = lCoulIds + list(range(1, 25))
-                                    counts = Counter(lCoulIds)
-                                    lCoulIds = [value for value, count in counts.items() if count > 1]
-                            else: #si pas noir ni blc
-                                pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
-                                if len(lCoulIds) == 0: # si liste vide on ajoute les couleurs
-                                    for col in pat.colors.all():
-                                        lCoulIds.append(col.id)
-                                else: # sinon on ajoute les couleurs et on garde seulement les doublons
-                                    for col in pat.colors.all():
-                                        lCoulIds.append(col.id)
-                                    counts = Counter(lCoulIds)
-                                    lCoulIds = [value for value, count in counts.items() if count > 1]
+                        if len(lFirstLayerIds) == 0:
+                            FirstLayer = -1
+                            data['1st'] = FirstLayer
+                        else:
+                            FirstLayer = Clothe.objects.get(id = random.choice(lFirstLayerIds))
+                            FirstLayerId = FirstLayer.id
+                            data['1st'] = FirstLayer
 
-                        lCoulIds.append(1) # on ajoute le blanc et le noir qui sont compatible avec tout
-                        lCoulIds.append(2)
-                        lCoulIds = list(set(lCoulIds))
-                        data['lCoulIds'] = lCoulIds   
+                            # crée la liste des couleurs
+                            lCoul = FirstLayer.colors
+                            for c in lCoul.all():
+                                if c.id == 1 or c.id == 2: # si noir ou blanc 
+                                    if len(lCoulIds) == 0: # et si liste vide on ajoute tout
+                                        lCoulIds = list(range(1, 25))
+                                    '''else: # et si liste déja remplie on ajoute tout et on garde seulement les doublons
+                                        lCoulIds = lCoulIds + list(range(1, 25))
+                                        counts = Counter(lCoulIds)
+                                        lCoulIds = [value for value, count in counts.items() if count > 1]'''
+                                else: #si pas noir ni blc
+                                    pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
+                                    if len(lCoulIds) == 0: # si liste vide on ajoute les couleurs
+                                        for col in pat.colors.all():
+                                            lCoulIds.append(col.id)
+                                    else: # sinon on ajoute les couleurs et on garde seulement les doublons
+                                        for col in pat.colors.all():
+                                            lCoulIds.append(col.id)
+                                        counts = Counter(lCoulIds)
+                                        lCoulIds = [value for value, count in counts.items() if count > 1]
+
+                            lCoulIds.append(1) # on ajoute le blanc et le noir qui sont compatible avec tout
+                            lCoulIds.append(2)
+                            lCoulIds = list(set(lCoulIds))
+                            data['lCoulIds'] = lCoulIds   
                     else:
                         FirstLayer = -1
                         data['1st'] = FirstLayer
