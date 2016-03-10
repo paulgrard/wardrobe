@@ -669,6 +669,7 @@ def generateOutfit(request):
     lCoulIds = []
     lSecondLayerIds = []
     lFirstLayerIds = []
+    lPantIds = []
     
     if currentUser.is_authenticated():
         if request.method == "POST":
@@ -713,7 +714,7 @@ def generateOutfit(request):
                     outfitLayers = 2
 
                 ptsTop = 0
-                ptsLow = 0
+                ptsPant = 0
                 ptsCoat = 0
                 ptsShoes = 0
                 ptsVarious = 0
@@ -721,75 +722,77 @@ def generateOutfit(request):
 
                 if temp > 30:
                     ptsTop = 2
-                    ptsLow = 2
+                    ptsPant = 2
                     ptsCoat = 0
                     ptsShoes = 2
                     ptsVarious = 2
                     
                 if temp in range(25, 30): 
                     ptsTop = 3
-                    ptsLow = 3
+                    ptsPant = 3
                     ptsCoat = 0
                     ptsShoes = 3
                     ptsVarious = 3
                     
                 if temp in range(20, 25):
                     ptsTop = 4
-                    ptsLow = 4
+                    ptsPant = 4
                     ptsCoat = 4
                     ptsShoes = 4
                     ptsVarious = 4
                     
                 if temp in range(15, 20):
                     ptsTop = 8
-                    ptsLow = 6
+                    ptsPant = 6
                     ptsCoat = 7
                     ptsShoes = 5
                     ptsVarious = 5
                     
                 if temp in range(10, 15):
                     ptsTop = 14
-                    ptsLow = 7
+                    ptsPant = 7
                     ptsCoat = 10
                     ptsShoes = 7
                     ptsVarious = 9
                     
                 if temp in range(5, 10):
                     ptsTop = 16
-                    ptsLow = 8
+                    ptsPant = 8
                     ptsCoat = 14
                     ptsShoes = 10
                     ptsVarious = 18
                     
                 if  temp in range(0, 5):
                     ptsTop = 18
-                    ptsLow = 9
+                    ptsPant = 9
                     ptsCoat = 17
                     ptsShoes = 12
                     ptsVarious = 26
                     
                 if temp in range(-5, 0):
                     ptsTop = 20
-                    ptsLow = 9
+                    ptsPant = 9
                     ptsCoat = 18
                     ptsShoes = 13
                     ptsVarious = 31
                     
                 if  temp in range(-10, -5):
                     ptsTop = 22
-                    ptsLow = 9
+                    ptsPant = 9
                     ptsCoat = 19
                     ptsShoes = 14
                     ptsVarious = 33
                     
                 if temp <= -10:
                     ptsTop = 24
-                    ptsLow = 9
+                    ptsPant = 9
                     ptsCoat = 20
                     ptsShoes = 15
                     ptsVarious = 35
                     
-                
+
+
+                #############################################
                     
                 
                 # choisir le vêtement de la seconde couche
@@ -798,7 +801,7 @@ def generateOutfit(request):
                     ptsFirst = int(ptsTop/3)
                     ptsSecond = ptsTop - ptsFirst
                                                         #appartient au user     est dans le theme        appartient à la couche 2 ou 0
-                    lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & (Q(category__layer = 2) | Q(category__layer = 0)))
+                    lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(area = 1) & (Q(category__layer = 2) | Q(category__layer = 0)))
                     
                     if lSecondLayer:
                         for c in lSecondLayer:
@@ -810,10 +813,10 @@ def generateOutfit(request):
                         
                         if len(lSecondLayerIds) == 0:
                             SecondLayer = -1
-                            data['2nd'] = SecondLayer
+                            data['secondLayer'] = SecondLayer
                         else:
                             SecondLayer = Clothe.objects.get(id = random.choice(lSecondLayerIds))
-                            data['2nd'] = SecondLayer.id
+                            data['secondLayer'] = SecondLayer.id
                             #SecondLayerId = SecondLayer.id
                             
 
@@ -844,15 +847,57 @@ def generateOutfit(request):
                                
                     else:
                         SecondLayer = -1
-                        data['2nd'] = SecondLayer
+                        data['secondLayer'] = SecondLayer
 
 
 
+                    # génération du pantalon
+                                                                                                                                            #jeans id = 31                    
+                    lPant = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(area = 2) & (Q(colors__id__in = lCoulIds) | Q(category__id = 31)))
 
+                    if lPant:
+                        for c in lPant:
+                            warmthTot = c.category.warmth * c.warmth
+                            if (warmthTot >= (ptsPant-1)) and (warmthTot <= (ptsPant+1)):
+                                lPantIds.append(c.id)
+
+                        if len(lPantIds) == 0:
+                            pant = -1
+                            data['pant'] = pant
+                        else:
+                            pant = Clothe.objects.get(id = random.choice(lPantIds))
+
+                            lCoul = pant.colors
+
+                            for c in lCoul.all():
+                                if c.id == 1:
+                                    lCoulIds.append(1) 
+                                if c.id == 2:
+                                    lCoulIds.append(2)
+
+                                lCoulIds = list(set(lCoulIds))
+                                
+                                if c.id!= 1 and c.id!=2: #si pas blc ni noir
+                                    pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
+                                    for col in pat.colors.all(): # on ajoute les couleurs
+                                        lCoulIds.append(col.id)
+                                    counts = Counter(lCoulIds) #et on garde que les doublons
+                                    lCoulIds = [value for value, count in counts.items() if count > 1]
+
+                            data['lCoulIds'] = lCoulIds
+                            pantId = pant.id
+                            data['pant'] = pantId
+                    else:
+                        pant = -1
+                        data['pant'] = pant
+
+
+                        
+                    
 
                     # choisir le vêtement de la 1ere couche (si 2eme couche)
                     
-                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(colors__id__in = lCoulIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
+                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(area = 1) & Q(colors__id__in = lCoulIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
 
                     if lFirstLayer:
                         for c in lFirstLayer:
@@ -864,7 +909,7 @@ def generateOutfit(request):
 
                         if len(lFirstLayerIds) == 0:
                             FirstLayer = -1
-                            data['1st'] = FirstLayer
+                            data['firstLayer'] = FirstLayer
                         else:
                             FirstLayer = Clothe.objects.get(id = random.choice(lFirstLayerIds))
 
@@ -887,19 +932,22 @@ def generateOutfit(request):
 
                             data['lCoulIds'] = lCoulIds
                             FirstLayerId = FirstLayer.id
-                            data['1st'] = FirstLayerId
+                            data['firstLayer'] = FirstLayerId
                     else:
                         FirstLayer = -1
-                        data['1st'] = FirstLayer
+                        data['firstLayer'] = FirstLayer
 
+
+
+            ############################################################
 
 
                         
                 # choisir le vêtement de la 1ere couche (si pas 2eme couche)
                 else:
                     SecondLayer = -1
-                    data['2nd'] = SecondLayer
-                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & (Q(category__layer = 1) | Q(category__layer = 0)))
+                    data['secondLayer'] = SecondLayer
+                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(area = 1) & (Q(category__layer = 1) | Q(category__layer = 0)))
 
                     if lFirstLayer:
                         for c in lFirstLayer:
@@ -910,11 +958,11 @@ def generateOutfit(request):
 
                         if len(lFirstLayerIds) == 0:
                             FirstLayer = -1
-                            data['1st'] = FirstLayer
+                            data['firstLayer'] = FirstLayer
                         else:
                             FirstLayer = Clothe.objects.get(id = random.choice(lFirstLayerIds))
                             FirstLayerId = FirstLayer.id
-                            data['1st'] = FirstLayer
+                            data['firstLayer'] = FirstLayer
 
                             # crée la liste des couleurs
                             lCoul = FirstLayer.colors
@@ -943,11 +991,53 @@ def generateOutfit(request):
                             data['lCoulIds'] = lCoulIds   
                     else:
                         FirstLayer = -1
-                        data['1st'] = FirstLayer
+                        data['firstLayer'] = FirstLayer
 
-                
-                
+
+
+                # génération du pantalon
                     
+                    lPant = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(area = 2) & (Q(colors__id__in = lCoulIds) | Q(category__id = 31)))
+
+                    if lPant:
+                        for c in lPant:
+                            warmthTot = c.category.warmth * c.warmth
+                            if (warmthTot >= (ptsPant-1)) and (warmthTot <= (ptsPant+1)):
+                                lPantIds.append(c.id)
+
+                        if len(lPantIds) == 0:
+                            pant = -1
+                            data['pant'] = pant
+                        else:
+                            pant = Clothe.objects.get(id = random.choice(lPantIds))
+
+                            lCoul = pant.colors
+
+                            for c in lCoul.all():
+                                if c.id == 1:
+                                    lCoulIds.append(1) 
+                                if c.id == 2:
+                                    lCoulIds.append(2)
+
+                                lCoulIds = list(set(lCoulIds))
+                                
+                                if c.id!= 1 and c.id!=2: #si pas blc ni noir
+                                    pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
+                                    for col in pat.colors.all(): # on ajoute les couleurs
+                                        lCoulIds.append(col.id)
+                                    counts = Counter(lCoulIds) #et on garde que les doublons
+                                    lCoulIds = [value for value, count in counts.items() if count > 1]
+
+                            data['lCoulIds'] = lCoulIds
+                            pantId = pant.id
+                            data['pant'] = pantId
+                    else:
+                        pant = -1
+                        data['pant'] = pant
+                
+
+
+                ################################################
                 '''Thunderstorm
                 Drizzle
                 Rain
