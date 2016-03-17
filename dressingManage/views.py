@@ -893,14 +893,27 @@ def generateOutfit(request):
                 # récupère weather
                 #content = urlopen('http://api.openweathermap.org/data/2.5/find?lat=' + str(lat) + '&lon=' + str(lon) + '&cnt=1&appid=f7dea76625663a7ce872ba2c9c206fec').read().decode("utf-8")
                 content = urlopen('http://api.openweathermap.org/data/2.5/forecast/daily?lat=' + str(lat) + '&lon=' + str(lon) + '&cnt=1&appid=f7dea76625663a7ce872ba2c9c206fec').read().decode("utf-8")
+                #content = urlopen('http://api.openweathermap.org/data/2.5/forecast/daily?lat=' + str(lat) + '&lon=' + str(lon) + 'cnt=5&appid=f7dea76625663a7ce872ba2c9c206fec').read().decode("utf-8")
+                #http://api.openweathermap.org/data/2.5/forecast?lat=35&lon=139&appid=b1b15e88fa797225412429c1c50c122a
                 content = json.loads(content)
+                data['con']=content
+                '''i = 1
+                temp = 0
+                while i!=5:
+                    temp += content["list"][i]["temp"]
+                    i++
+                '''
                 #temp = content["list"][0]["main"]["temp"]
                 tempD = content["list"][0]["temp"]["day"]
+                data["tempD"] = tempD 
                 tempE = content["list"][0]["temp"]["eve"]
+                data["tempE"] = tempE 
                 tempM = content["list"][0]["temp"]["morn"]
-                temp = ( tempD + tempE + tempM )/3
-                temp = int(round(temp - 273.15))
+                data["tempM"] =tempM 
+                #temp = ( tempD + tempE + tempM )/3
+                temp = int(round(tempD - 273.15))
                 data["temp"] = temp
+                temp=8
                 weather = content["list"][0]["weather"][0]["main"]
                 weatherDescription = content["list"][0]["weather"][0]["description"]
                 #"light rain"
@@ -1465,7 +1478,17 @@ def generateOutfit(request):
                         hood = Clothe.objects.get(id = random.choice(lHoodIds))
                         data['hood'] = hood.id
 
-    
+
+                #etole foulard
+                if temp>=12 and temp<20:
+                    flag = random.randint(0,1)
+                    if flag==1:
+                        lFoulard = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & (Q(category__id = 74) | Q(category__id = 73)))
+                        if lFoulard:
+                            lFoulardIds = [c.id for c in lFoulard]
+                            foulard = Clothe.objects.get(id = random.choice(lFoulardIds))
+                            data['foulard'] = foulard.id
+                    
                         
                 success = True
             else: # si form non valide
