@@ -872,9 +872,11 @@ def generateOutfit(request):
     success = False
     currentUser = request.user
     lCoulIds = []
+    lCoulPant = []
     lSecondLayerIds = []
     lFirstLayerIds = []
     lPantIds = []
+    lCoatIds = []
     
     if currentUser.is_authenticated():
         if request.method == "POST":
@@ -894,13 +896,14 @@ def generateOutfit(request):
                 tempM = content["list"][0]["temp"]["morn"]
                 temp = ( tempD + tempE + tempM )/3
                 temp = int(round(temp - 273.15))
+                temp = 8
                 data["temp"] = temp
                 weather = content["list"][0]["weather"][0]["main"]
                 weatherDescription = content["list"][0]["weather"][0]["description"]
                 #"light rain"
                 data["weather"] = weather
 
-
+                
                 # récupère thèmes
                 if themesC:
                     try:
@@ -996,7 +999,7 @@ def generateOutfit(request):
                     ptsVarious = 35
                     
 
-
+                
                 #############################################
                     
                 
@@ -1037,6 +1040,7 @@ def generateOutfit(request):
                                     if c.id == 1 or c.id == 2: # si noir ou blanc 
                                         if len(lCoulIds) == 0: # et si liste vide on ajoute tout
                                             lCoulIds = list(range(1, 25))
+                                            
                                         '''else: # et si liste déja remplie on ajoute tout et on garde seulement les doublons           !!!!!!!!!!!!! ne sert à rien !!!
                                             lCoulIds = lCoulIds + list(range(1, 25))
                                             counts = Counter(lCoulIds)
@@ -1051,10 +1055,13 @@ def generateOutfit(request):
                                                 lCoulIds.append(col.id)
                                             counts = Counter(lCoulIds)
                                             lCoulIds = [value for value, count in counts.items() if count > 1]
-
+                            
                             lCoulIds.append(1) # on ajoute le blanc et le noir qui sont compatible avec tout
                             lCoulIds.append(2)
                             lCoulIds = list(set(lCoulIds))
+                            data['lCoulIds'] = list(lCoulIds)
+                            
+                            
                                
                     else:
                         SecondLayer = -1
@@ -1080,15 +1087,13 @@ def generateOutfit(request):
                         else:
                             pant = Clothe.objects.get(id = random.choice(lPantIds))
 
-                            lCoul = pant.colors
+                            lCoulPant = pant.colors
 
-                            for c in lCoul.all():
+                            for c in lCoulPant.all():
                                 quant = Quantity.objects.get(id = pant.quantities.all(), color = c)
                                 if quant.quantity >= 20:
-                                    if c.id == 1:
-                                        lCoulIds.append(1) 
-                                    if c.id == 2:
-                                        lCoulIds.append(2)
+                                    lCoulIds.append(1) 
+                                    lCoulIds.append(2)
 
                                     lCoulIds = list(set(lCoulIds))
                                     
@@ -1099,13 +1104,18 @@ def generateOutfit(request):
                                         counts = Counter(lCoulIds) #et on garde que les doublons
                                         lCoulIds = [value for value, count in counts.items() if count > 1]
 
-                            data['lCoulIds'] = lCoulIds
+                            #data['lCoulIds'] = lCoulIds
                             pantId = pant.id
                             data['pant'] = pantId
+                            lCoulIds.append(1) 
+                            lCoulIds.append(2)
+
+                            lCoulIds = list(set(lCoulIds))
+                            data['lCoulIds'] = list(lCoulIds)
                     else:
                         pant = -1
                         data['pant'] = pant
-
+                        
 
                         
                     
@@ -1133,13 +1143,15 @@ def generateOutfit(request):
                             for c in lCoul.all():
                                 quant = Quantity.objects.get(id = FirstLayer.quantities.all(), color = c)
                                 if quant.quantity >= 20:
-                                    if c.id == 1:
-                                        lCoulIds.append(1) 
-                                    if c.id == 2:
-                                        lCoulIds.append(2)
-
-                                    lCoulIds = list(set(lCoulIds))
                                     
+                                    lCoulIds.append(1) 
+                                    
+                                    lCoulIds.append(2)
+                                    
+                                    lCoulIdsF = set(lCoulIds)
+                                   
+                                    lCoulIdsF = list(lCoulIdsF)
+                                    data['lCoulIdsF'] = lCoulIdsF
                                     if c.id!= 1 and c.id!=2: #si pas blc ni noir
                                         pat = Pattern.objects.get(id = c.id) # on récupère le pattern correspondant
                                         for col in pat.colors.all(): # on ajoute les couleurs
@@ -1147,9 +1159,14 @@ def generateOutfit(request):
                                         counts = Counter(lCoulIds) #et on garde que les doublons
                                         lCoulIds = [value for value, count in counts.items() if count > 1]
 
-                            data['lCoulIds'] = lCoulIds
+                            
                             FirstLayerId = FirstLayer.id
                             data['firstLayer'] = FirstLayerId
+
+                            lCoulIds.append(1) 
+                            lCoulIds.append(2)
+                            lCoulIdsF = set(lCoulIds)
+                            data['lCoulIds'] = list(lCoulIds)
                     else:
                         FirstLayer = -1
                         data['firstLayer'] = FirstLayer
@@ -1207,7 +1224,7 @@ def generateOutfit(request):
                             lCoulIds.append(1) # on ajoute le blanc et le noir qui sont compatible avec tout
                             lCoulIds.append(2)
                             lCoulIds = list(set(lCoulIds))
-                            data['lCoulIds'] = lCoulIds   
+                            data['lCoulIds'] = list(lCoulIds)   
                     else:
                         FirstLayer = -1
                         data['firstLayer'] = FirstLayer
@@ -1230,15 +1247,13 @@ def generateOutfit(request):
                         else:
                             pant = Clothe.objects.get(id = random.choice(lPantIds))
 
-                            lCoul = pant.colors
+                            lCoulPant = pant.colors
 
-                            for c in lCoul.all():
+                            for c in lCoulPant.all():
                                 quant = Quantity.objects.get(id = pant.quantities.all(), color = c)
                                 if quant.quantity >= 20:
-                                    if c.id == 1:
-                                        lCoulIds.append(1) 
-                                    if c.id == 2:
-                                        lCoulIds.append(2)
+                                    lCoulIds.append(1) 
+                                    lCoulIds.append(2)
 
                                     lCoulIds = list(set(lCoulIds))
                                     
@@ -1249,9 +1264,14 @@ def generateOutfit(request):
                                         counts = Counter(lCoulIds) #et on garde que les doublons
                                         lCoulIds = [value for value, count in counts.items() if count > 1]
 
-                            data['lCoulIds'] = lCoulIds
+                            
                             pantId = pant.id
                             data['pant'] = pantId
+                            lCoulIds.append(1) 
+                            lCoulIds.append(2)
+
+                            lCoulIds = list(set(lCoulIds))
+                            data['lCoulIds'] = list(lCoulIds)
                     else:
                         pant = -1
                         data['pant'] = pant
@@ -1266,6 +1286,48 @@ def generateOutfit(request):
                 Clear
                 Clouds
                 Extreme'''
+
+
+                # generation du manteau
+                if ptsCoat != 0:
+                    if pant:
+                        lCoulPId = [c.id for c in lCoulPant.all()]
+                        lCoulIdsCoat = [c for c in list(lCoulIds) if c not in lCoulPId]
+                        lCoulIdsCoat.append(1)
+                        lCoulIdsCoat.append(2)
+                        lCoulIdsCoat = list(set(lCoulIdsCoat))
+                    lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(category__layer = 3) & Q(colors__id__in = lCoulIdsCoat))
+
+                    if lCoat:
+                        for c in lCoat:
+                            warmthTot = c.category.warmth * c.warmth
+                            if (warmthTot >= (ptsCoat-3)) and (warmthTot <= (ptsCoat+3)):
+                                lCoatIds.append(c.id)
+
+                        if len(lCoatIds) == 0:
+                            data['coat'] = -1
+                        else:
+                            coat = Clothe.objects.get(id = random.choice(lCoatIds))
+
+                            data['lCoulIdsCoat'] = list(lCoulIdsCoat)
+                            coatId = coat.id
+                            data['coat'] = coatId
+                    else:
+                        coat = -1
+                        data['coat'] = coat
+
+                else:
+                    if weatherDescription == "Rain":
+                        
+                        lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(category__layer = 3) & Q(category__id = 25))
+
+                        if lCoat:
+                            coat = Clothe.objects.get(id = random.choice(lCoat.id))
+                        else:
+                            coat = -1
+                            data['coat'] = coat
+
+
 
 
                 
