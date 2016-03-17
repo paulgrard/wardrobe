@@ -1440,7 +1440,32 @@ def generateOutfit(request):
                         lScarfIds = [c.id for c in lScarf]
                         scarf = Clothe.objects.get(id = random.choice(lScarfIds))
                         data['scarf'] = scarf.id
-                            
+
+                #gants et mitaines
+                if temp<=8:
+                    lGlove = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & (Q(category__id = 66) | Q(category__id = 72)))
+                    if lGlove:
+                        lGloveIds = [c.id for c in lGlove]
+                        glove = Clothe.objects.get(id = random.choice(lGloveIds))
+                        data['glove'] = glove.id
+
+                #bonnet
+                if temp<=8 and temp>-5:
+                    lBonnet = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(category__id = 67))
+                    if lBonnet:
+                        lBonnetIds = [c.id for c in lBonnet]
+                        bonnet = Clothe.objects.get(id = random.choice(lBonnetIds))
+                        data['bonnet'] = bonnet.id    
+
+                #cagoule
+                if temp<=-5:
+                    lHood = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(category__id = 71))
+                    if lHood:
+                        lHoodIds = [c.id for c in lHood]
+                        hood = Clothe.objects.get(id = random.choice(lHoodIds))
+                        data['hood'] = hood.id
+
+    
                         
                 success = True
             else: # si form non valide
