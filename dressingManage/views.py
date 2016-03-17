@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseForbidden, Http404
 from dressingManage.forms import AddClotheForm, AddThemeForm, GetThemeForm, forms, WeatherForm, EditClotheForm, OutfitGenerationForm
 from django.contrib.auth.models import User
 from dressingManage.models import Clothe, Category, Color, Theme, Quantity, Pattern
+from userManage.models import Parameters
 import json, os
 from urllib.request import urlopen
 from django.core.files.uploadedfile import TemporaryUploadedFile
@@ -873,10 +874,13 @@ def generateOutfit(request):
     currentUser = request.user
     lCoulIds = []
     lCoulPant = []
+    lCoulIdsUnderwear = []
     lSecondLayerIds = []
     lFirstLayerIds = []
     lPantIds = []
     lCoatIds = []
+    lHeadgeardIds = []
+    lCapIds = []
     
     if currentUser.is_authenticated():
         if request.method == "POST":
@@ -896,7 +900,6 @@ def generateOutfit(request):
                 tempM = content["list"][0]["temp"]["morn"]
                 temp = ( tempD + tempE + tempM )/3
                 temp = int(round(temp - 273.15))
-                temp = 8
                 data["temp"] = temp
                 weather = content["list"][0]["weather"][0]["main"]
                 weatherDescription = content["list"][0]["weather"][0]["description"]
@@ -1111,7 +1114,7 @@ def generateOutfit(request):
                             lCoulIds.append(2)
 
                             lCoulIds = list(set(lCoulIds))
-                            data['lCoulIds'] = list(lCoulIds)
+                            #data['lCoulIds'] = list(lCoulIds)
                     else:
                         pant = -1
                         data['pant'] = pant
@@ -1166,7 +1169,7 @@ def generateOutfit(request):
                             lCoulIds.append(1) 
                             lCoulIds.append(2)
                             lCoulIdsF = set(lCoulIds)
-                            data['lCoulIds'] = list(lCoulIds)
+                            #data['lCoulIds'] = list(lCoulIds)
                     else:
                         FirstLayer = -1
                         data['firstLayer'] = FirstLayer
@@ -1224,7 +1227,7 @@ def generateOutfit(request):
                             lCoulIds.append(1) # on ajoute le blanc et le noir qui sont compatible avec tout
                             lCoulIds.append(2)
                             lCoulIds = list(set(lCoulIds))
-                            data['lCoulIds'] = list(lCoulIds)   
+                            #data['lCoulIds'] = list(lCoulIds)   
                     else:
                         FirstLayer = -1
                         data['firstLayer'] = FirstLayer
@@ -1271,7 +1274,7 @@ def generateOutfit(request):
                             lCoulIds.append(2)
 
                             lCoulIds = list(set(lCoulIds))
-                            data['lCoulIds'] = list(lCoulIds)
+                            #data['lCoulIds'] = list(lCoulIds)
                     else:
                         pant = -1
                         data['pant'] = pant
@@ -1290,12 +1293,14 @@ def generateOutfit(request):
 
                 # generation du manteau
                 if ptsCoat != 0:
-                    if pant:
+                    if pant!=-1:
                         lCoulPId = [c.id for c in lCoulPant.all()]
                         lCoulIdsCoat = [c for c in list(lCoulIds) if c not in lCoulPId]
                         lCoulIdsCoat.append(1)
                         lCoulIdsCoat.append(2)
                         lCoulIdsCoat = list(set(lCoulIdsCoat))
+                    else:
+                        lCoulIdsCoat = list(range(1,25))
                     lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(category__layer = 3) & Q(colors__id__in = lCoulIdsCoat))
 
                     if lCoat:
@@ -1328,9 +1333,115 @@ def generateOutfit(request):
                             data['coat'] = coat
 
 
+                ###################################
+
+                # generation des sous vêtements
+
+                param = Parameters.objects.get(user = currentUser)
+                if param.sex == 1: #si femme
+                    lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 58) | Q(category__id = 56) | Q(category__id = 55) | Q(category__id = 54) | Q(category__id = 53)))
+
+                    if lUnderwear:
+                        lUnderwearIds = [c.id for c in lUnderwear]
+                        underwear = Clothe.objects.get(id = random.choice(lUnderwearIds))
+
+                        for c in underwear.color.all():
+                            pat = Pattern.objects.get(id = c.id)
+                            for col in pat.colors.all():
+                                lCoulIdsUnderwear.append(col.id)
+                        lCoulIdsUnderwear = list(set(lCoulIdsUnderwear))
+                        data['underwear'] = underwear.id
+
+                    else:
+                        data['underwear'] = -1
+
+                    #select top en fonction des couleurs
+                    lUnderwearTop = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 59) | Q(category__id = 64)) & Q(colors__id__in = lCoulIdsUnderwear))
+
+                    if lUnderwearTop:
+                        lUnderwearTopIds = [c.id for c in lUnderwearTop]
+                        underwearTop = Clothe.objects.get(id = random.choice(lUnderwearTopIds))
+                        data['underwearTop'] = underwearTop.id
+                    else: # si il n'y a rien on essaye sans les couleurs
+                        lUnderwearTop = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 59) | Q(category__id = 64)))
+
+                        if lUnderwearTop:
+                            lUnderwearTopIds = [c.id for c in lUnderwearTop]
+                            underwearTop = Clothe.objects.get(id = random.choice(lUnderwearTopIds))
+                            data['underwearTop'] = underwearTop.id
+                        else:
+                            data['underwearTop'] = -1
 
 
+                    lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
+                    
+                    if lSock:
+                        lSockIds = [c.id for c in lSock]
+                        sock = Clothe.objects.get(id = random.choice(lSockIds))
+                        data['sock'] = sock.id
+                    else:
+                        data['sock'] = -1
+
+
+                else: #si homme
+                    lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 58) | Q(category__id = 57) | Q(category__id = 56)))
+
+                    if lUnderwear:
+                        lUnderwearIds = [c.id for c in lUnderwear]
+                        underwear = Clothe.objects.get(id = random.choice(lUnderwearIds))
+                        data['underwear'] = underwear.id
+
+                    else:
+                        data['underwear'] = -1
+
+
+                    lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 60)))
+                    
+                    if lSock:
+                        lSockIds = [c.id for c in lSock]
+                        sock = Clothe.objects.get(id = random.choice(lSockIds))
+                        data['sock'] = sock.id
+                    else:
+                        data['sock'] = -1
+                    
+
+                ###################################
+
+
+                #generation des accessoires
+
+                # casquette
+                if weatherDescription == "Clear" and temp>25:
+                    lCap = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(category__id = 69))
+                    if lCap:
+                        lCapIds = [c.id for c in lCap]
+                        cap = Clothe.objects.get(id = random.choice(lCapIds))
+                        data['cap'] = cap.id
+
+
+
+                # chapeau et beret
                 
+                if weatherDescription == "Clear" and temp<25 and temp >8:
+                    flag = random.randint(0,1)
+                    if flag==1:
+                        lHeadgear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & (Q(category__id = 68) | Q(category__id = 70)))
+                        if lHeadgear:
+                            lHeadgeardIds = [c.id for c in lHeadgear]
+                            headgear = Clothe.objects.get(id = random.choice(lHeadgearIds))
+                            data['headgear'] = headgear.id
+
+
+                # echarpe
+                
+                if temp<12:
+                    lScarf = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(category__id = 65))
+                    if lScarf:
+                        lScarfIds = [c.id for c in lScarf]
+                        scarf = Clothe.objects.get(id = random.choice(lScarfIds))
+                        data['scarf'] = scarf.id
+                            
+                        
                 success = True
             else: # si form non valide
                 data['message'] = 'Formulaire non valide.'
