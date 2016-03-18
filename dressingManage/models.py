@@ -57,15 +57,9 @@ class Pattern(models.Model):
         return self.name
 
 class Outfit(models.Model):
-    clothes = models.ForeignKey(Clothe, blank = True, null = True)
-    wearing = models.NullBooleanField()
-
-    def __str__(self):
-        return self.clothes
-
-class outfitStorage(models.Model):
-    clothes = models.ForeignKey(Clothe, blank = True, null = True)
+    clothes = models.ManyToManyField(Clothe, blank = True)
     userOwner = models.OneToOneField(User, blank = True, null = True)
+    generating = models.NullBooleanField()
 
     def __str__(self):
-        return self.userOwner.name
+        return self.userOwner.username

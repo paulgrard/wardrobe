@@ -1,5 +1,5 @@
 from django.contrib import admin
-from dressingManage.models import Category, Clothe, Color, Theme, Pattern, Quantity
+from dressingManage.models import Category, Clothe, Color, Theme, Pattern, Quantity, Outfit
 from userManage.models import Parameters
 
 # Register your models here.
@@ -32,3 +32,4 @@ admin.site.register(Quantity)
 admin.site.register(Theme, ThemeAdmin)
 admin.site.register(Pattern)
 admin.site.register(Parameters)
+admin.site.register(Outfit)
