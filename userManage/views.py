@@ -134,12 +134,12 @@ def setParameters(request):
 def getParameters(request):
     data={}
     success = False
-    user=request.user
+    currentUser=request.user
 
     if request.user.is_authenticated():
-        data['mail'] = user.email
-        data['name'] = user.username
-        param = get_object_or_404(Parameters, user = user)
+        data['mail'] = currentUser.email
+        data['name'] = currentUser.username
+        param = get_object_or_404(Parameters, user = currentUser)
         data['sex'] = param.sex
         success = True
     else:
