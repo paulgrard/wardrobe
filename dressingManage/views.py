@@ -315,6 +315,53 @@ def getAllClothes(request):
 
 
 
+
+def getClothe(request, idC):
+    data = {}
+    infos = {}
+    themes = {}
+    success = False
+    currentUser = request.user
+    clothInfo = []
+
+    if currentUser.is_authenticated():
+        cloth = get_object_or_404(Clothe, id = idC)
+        
+        infos['id'] = idC
+        infos['warmth'] = cloth.warmth
+        infos['photo'] = cloth.photo
+        infos['state'] = cloth.state
+        infos['category'] = cloth.category.name
+        infos['categoryId'] = cloth.category.id
+
+        
+        for t in cloth.themes.all():
+            themes[t.id] = t.name
+        infos['themes'] = themes
+
+        for c in cloth.colors.all():
+            infos_color = {}
+            for q in cloth.quantities.all():
+                
+                if q.color == c:
+                    infos_color['code'] = str(c.code)
+                    infos_color['id'] = c.id
+                    infos_color['name'] = c.name
+                    infos_color['quantity'] = q.quantity
+            
+        infos['color'] = infos_color
+        data['infos'] = infos
+        success = True
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+
+
+
 def getClothesFromCategory(request, idC):
     data = {}
     success = False

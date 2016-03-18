@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^addClothe$',views.addClothe, name='addClothe'),
     url(r'^editClothe/(?P<idC>\d+)$',views.editClothe, name='editClothe'),
     url(r'^getAllClothes$',views.getAllClothes, name='getAllClothes'),
+    url(r'^getClothe/(?P<idC>\d+)$',views.getClothe, name='getClothe'),
     url(r'^getClothesFromCategory/(?P<idC>\d+)$', views.getClothesFromCategory, name='getClothesFromCategory'),
     url(r'^addTheme$',views.addTheme, name='addTheme'),
     url(r'^getThemes$',views.getThemes, name='getThemes'),

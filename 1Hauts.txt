@@ -52,9 +52,6 @@ col roulé
 tunique
 2
 0
-combinaison
-3
-0
 combinaison haut
 5
 3
