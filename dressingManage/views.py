@@ -161,7 +161,7 @@ def editClothe(request,idC):
                 quantitiesC = []
 
 
-                cloth = get_object_or_404(Clothe, id = idC, user=currentUser)
+                cloth = get_object_or_404(Clothe, id = int(idC), user=currentUser)
 
                 if categoryC and areaC:
                     cat = get_object_or_404(Category, pk = categoryC, area = areaC)
@@ -327,9 +327,9 @@ def getClothe(request, idC):
     colors = []
 
     if currentUser.is_authenticated():
-        cloth = get_object_or_404(Clothe, id = idC)
+        cloth = get_object_or_404(Clothe, id = int(idC))
         
-        infos['id'] = idC
+        infos['id'] = int(idC)
         infos['warmth'] = cloth.warmth
         infos['photo'] = cloth.photo
         infos['state'] = cloth.state
@@ -370,7 +370,7 @@ def getClothesFromCategory(request, idC):
     pKey = []
     currentUser = request.user
     if currentUser.is_authenticated():
-        categ = get_object_or_404(Category, pk = idC)
+        categ = get_object_or_404(Category, pk = int(idC))
         clothesFromCat = Clothe.objects.filter(user = currentUser, category = categ)
         for clothe in clothesFromCat:
             pKey.append(clothe.pk)
@@ -542,7 +542,7 @@ def getColors(request, idC):
     temp = {}
 
     if currentUser.is_authenticated():
-        clothing = get_object_or_404(Clothe, id = idC, user = currentUser)
+        clothing = get_object_or_404(Clothe, id = int(idC), user = currentUser)
         if clothing:
             colorsFromClothe = clothing.colors
             quantFromClothe = clothing.quantities
@@ -605,7 +605,7 @@ def getPicture(request, idC):
     success = False
     currentUser = request.user
     if currentUser.is_authenticated():
-        clothing = get_object_or_404(Clothe, id = idC, user = currentUser)
+        clothing = get_object_or_404(Clothe, id = int(idC), user = currentUser)
         if clothing:
             pict = clothing.photo
 
@@ -672,7 +672,7 @@ def getCategoriesFromArea(request,idA):
     currentUser = request.user
     if currentUser.is_authenticated():
 
-        cats = Category.objects.filter(area = idA)
+        cats = Category.objects.filter(area = int(idA))
         for c in cats:
             cat = {}
             cat["name"] = c.name
@@ -694,8 +694,8 @@ def changeState(request, idC, state):
     currentUser = request.user
 
     if currentUser.is_authenticated():
-        cloth = Clothe.objects.get(id = idC, user=currentUser)
-        cloth.state = state
+        cloth = Clothe.objects.get(id = int(idC), user=currentUser)
+        cloth.state = int(state)
         cloth.save()
         success = True
 
@@ -852,7 +852,7 @@ def generateOutfit(request):
     cloth = {}
     various = []
 
-    SecondLayer = FirstLayer = pant = coat = shoes = underwear = underwearTop = sock = cap = headgear = scarf = glove = bonnet = hood = foulard = cravat = -1
+    SecondLayer = FirstLayer = pant = coat = shoes = underwear = underwearTop = sock = cap = headgear = scarf = glove = bonnet = hood = foulard = cravat = bag= -1
 
     
     if currentUser.is_authenticated():
@@ -1604,6 +1604,20 @@ def generateOutfit(request):
                             various.append(cloth)
 
 
+                #sac
+                cloth = {}
+                flag = random.randint(0,1)
+                if flag==1:
+                    lBag = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(colors__id__in = lCoulIds) & (Q(category__id = 77) | Q(category__id = 78) | Q(category__id = 79)))
+                    if lBag:
+                        lBagIds = [c.id for c in lBag]
+                        bag = Clothe.objects.get(id = random.choice(lBagIds))
+                        cloth['id'] = bag.id
+                        cloth['photo'] = bag.photo
+                        various.append(cloth)
+
+                            
+
                 if len(various)!=0:
                     tempo['various']=various
                 
@@ -1671,6 +1685,9 @@ def generateOutfit(request):
                     
                 if cravat!=-1:
                     clothesToPush.append(cravat)
+                    
+                if bag!=-1:
+                    clothesToPush.append(bag)
 
                 outfit.various.set(clothesToPush)
                 outfit.nbrLayer = outfitLayers
@@ -1941,7 +1958,7 @@ def switchClothe(request, idC, way):
                     #si tout est OK, on parcourt le dic et lorsqu'on trouve le vet qui est actuellement porté, on + ou - 1 selon le senspassé en param
                     for clothe in lSecondLayerIds:
                         if clothe == int(idC):
-                            if way == 0:
+                            if int(way) == 0:
                                 clothToReturn = lSecondLayerIds[lSecondLayerIds.index(clothe)-1]
                             else:
                                 if lSecondLayerIds.index(clothe)+1 > len(lSecondLayerIds):
@@ -1978,7 +1995,7 @@ def switchClothe(request, idC, way):
                     #si tout est OK, on parcourt le dic et lorsqu'on trouve le vet qui est actuellement porté, on + ou - 1 selon le senspassé en param
                     for clothe in lFirstLayerIds:
                         if clothe == int(idC):
-                            if way == 0:
+                            if int(way) == 0:
                                 clothToReturn = lFirstLayerIds[lFirstLayerIds.index(clothe)-1]
                             else:
                                 if lFirstLayerIds.index(clothe)+1 > len(lFirstLayerIds):
@@ -2006,7 +2023,7 @@ def switchClothe(request, idC, way):
                 else:
                     for clothe in lPantIds:
                         if clothe == int(idC):
-                            if way == 0:
+                            if int(way) == 0:
                                 clothToReturn = lPantIds[lPantIds.index(clothe)-1]
                             else:
                                 if lPantIds.index(clothe)+1 > len(lPantIds):
@@ -2026,7 +2043,7 @@ def switchClothe(request, idC, way):
                     
                     for clothe in lShoesIds:
                         if shoes == int(idC):
-                            if way == 0:
+                            if int(way) == 0:
                                 clothToReturn = lShoesIds[lShoesIds.index(clothe)-1]
                             else:
                                 if lShoesIds.index(clothe)+1 > len(lShoesIds):
@@ -2049,7 +2066,7 @@ def switchClothe(request, idC, way):
                     else:
                         for clothe in lShoesIds:
                             if clothe == int(idC):
-                                if way == 0:
+                                if int(way) == 0:
                                     clothToReturn = lShoesIds[lShoesIds.index(clothe)-1]
                                 else:
                                     if lShoesIds.index(clothe)+1 > len(lShoesIds):
@@ -2088,7 +2105,7 @@ def switchClothe(request, idC, way):
                 else:
                     for clothe in lCoatIds:
                         if clothe == int(idC):
-                            if way == 0:
+                            if int(way) == 0:
                                 clothToReturn = lCoatIds[lCoatIds.index(clothe)-1]
                             else:
                                 if lCoatIds.index(clothe)+1 > len(lCoatIds):
@@ -2110,7 +2127,7 @@ def switchClothe(request, idC, way):
                 lUnderwearIds = [c.id for c in lUnderwear]
                 for clothe in lUnderwearIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lUnderwearIds[lUnderwearIds.index(clothe)-1]
                         else:
                             if lUnderwearIds.index(clothe)+1 > len(lUnderwearIds):
@@ -2130,7 +2147,7 @@ def switchClothe(request, idC, way):
                 lUnderwearTopIds = [c.id for c in lUnderwearTop]
                 for clothe in lUnderwearTopIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lUnderwearTopIds[lUnderwearTopIds.index(clothe)-1]
                         else:
                             if lUnderwearTopIds.index(clothe)+1 > len(lUnderwearTopIds):
@@ -2149,7 +2166,7 @@ def switchClothe(request, idC, way):
                 lSockIds = [c.id for c in lSock]
                 for clothe in lSockIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lSockIds[lSockIds.index(clothe)-1]
                         else:
                             if lSockIds.index(clothe)+1 > len(lSockIds):
@@ -2173,7 +2190,7 @@ def switchClothe(request, idC, way):
                 lCapIds = [c.id for c in lCap]
                 for clothe in lCapIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lCapIds[lCapIds.index(clothe)-1]
                         else:
                             if lCapIds.index(clothe)+1 > len(lCapIds):
@@ -2194,7 +2211,7 @@ def switchClothe(request, idC, way):
                 lHeadgearIds = [c.id for c in lHeadgear]
                 for clothe in lHeadgearIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lHeadgearIds[lHeadgearIds.index(clothe)-1]
                         else:
                             if lHeadgearIds.index(clothe)+1 > len(lHeadgearIds):
@@ -2215,7 +2232,7 @@ def switchClothe(request, idC, way):
                 lScarfIds = [c.id for c in lScarf]
                 for clothe in lScarfIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lScarfIds[lScarfIds.index(clothe)-1]
                         else:
                             if lScarfIds.index(clothe)+1 > len(lScarfIds):
@@ -2236,7 +2253,7 @@ def switchClothe(request, idC, way):
                 lGloveIds = [c.id for c in lGlove]
                 for clothe in lGloveIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lGloveIds[lGloveIds.index(clothe)-1]
                         else:
                             if lGloveIds.index(clothe)+1 > len(lGloveIds):
@@ -2257,7 +2274,7 @@ def switchClothe(request, idC, way):
                 lBonnetIds = [c.id for c in lBonnet]
                 for clothe in lBonnetIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lBonnetIds[lBonnetIds.index(clothe)-1]
                         else:
                             if lBonnetIds.index(clothe)+1 > len(lBonnetIds):
@@ -2278,7 +2295,7 @@ def switchClothe(request, idC, way):
                 lHoodIds = [c.id for c in lHood]
                 for clothe in lHoodIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lHoodIds[lHoodIds.index(clothe)-1]
                         else:
                             if lHoodIds.index(clothe)+1 > len(lHoodIds):
@@ -2299,7 +2316,7 @@ def switchClothe(request, idC, way):
                 lFoulardIds = [c.id for c in lFoulard]
                 for clothe in lFoulardIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lFoulardIds[lFoulardIds.index(clothe)-1]
                         else:
                             if lFoulardIds.index(clothe)+1 > len(lFoulardIds):
@@ -2315,13 +2332,13 @@ def switchClothe(request, idC, way):
         #noeud pap / cravate
         if area == 5 and (cloth.category.id == 75 or cloth.category.id == 76):
             
-            lCravat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__id = 75) | Q(category__id = 76)))
+            lCravat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(colors__id__in = lColIds) & (Q(category__id = 75) | Q(category__id = 76)))
 
             if lCravat:
                 lCravatIds = [c.id for c in lCravat]
                 for clothe in lCravatIds:
                     if clothe == int(idC):
-                        if way == 0:
+                        if int(way) == 0:
                             clothToReturn = lCravatIds[lCravatIds.index(clothe)-1]
                         else:
                             if lCravatIds.index(clothe)+1 > len(lCravatIds):
@@ -2331,7 +2348,27 @@ def switchClothe(request, idC, way):
             else:
                 clothToReturn = -1
 
-        
+
+        #sac
+        if area == 5 and (cloth.category.id == 77 or cloth.category.id == 78 or cloth.category.id == 79):
+            
+            lBag = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__id = 77) | Q(category__id = 78) | Q(category__id = 79)))
+
+            if lBag:
+                lBagIds = [c.id for c in lBag]
+                for clothe in lBagIds:
+                    if clothe == int(idC):
+                        if int(way) == 0:
+                            clothToReturn = lBagIds[lBagIds.index(clothe)-1]
+                        else:
+                            if lBagIds.index(clothe)+1 > len(lBagIds):
+                                clothToReturn = lBagIds[0]
+                            else:
+                                clothToReturn = lBagIds[lBagIds.index(clothe)+1]
+            else:
+                clothToReturn = -1
+
+                
         info = {}
 
         if clothToReturn != -1:
