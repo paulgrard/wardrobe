@@ -57,9 +57,16 @@ class Pattern(models.Model):
         return self.name
 
 class Outfit(models.Model):
-    firstLayer = models.OneToOneField(Clothe, related_name="firstLayer_outfit", blank = True, null = True)
-    secondLayer = models.OneToOneField(Clothe, related_name="secondLayer_outfit", blank = True, null = True)
-    clothes = models.ManyToManyField(Clothe, blank = True)
+    firstLayer = models.OneToOneField(Clothe, related_name="firstLayer_outfit", null = True)
+    secondLayer = models.OneToOneField(Clothe, related_name="secondLayer_outfit", null = True)
+    pant = models.OneToOneField(Clothe, related_name="pant_outfit", null = True)
+    shoes = models.OneToOneField(Clothe, related_name="shoes_outfit", null = True)
+    coat = models.OneToOneField(Clothe, related_name="coat_outfit", null = True)
+    underwear = models.OneToOneField(Clothe, related_name="underwear_outfit", null = True)
+    underwearTop = models.OneToOneField(Clothe, related_name="underwearTop_outfit", null = True)
+    sock = models.OneToOneField(Clothe, related_name="sock", null = True)
+
+    various = models.ManyToManyField(Clothe, blank = True)
     userOwner = models.OneToOneField(User, null = True)
     generating = models.NullBooleanField()
     nbrLayer = models.PositiveIntegerField(null = True)
