@@ -685,8 +685,41 @@ def setGenerating(request, generatingState):
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
-    
 
+
+
+def getOutfitSettings(request):
+    data = {}
+    info = {}
+    clothes = []
+    success = False
+    currentUser = request.user
+
+
+    if currentUser.is_authenticated():
+        outfit = get_object_or_404(Outfit, userOwner = currentUser)
+
+        info['firstLayer'] = outfit.firstLayer.id
+        info['secondLayer'] = outfit.secondLayer.id
+        for c in outfit.clothes.all():
+            clothes.append(c.id)
+        info['clothes'] = clothes
+        info['generating'] = outfit.generating
+        info['nbrLayer'] = outfit.nbrLayer
+        info['theme'] = outfit.theme.name
+
+        data['settings'] = info
+        success = True
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')   
+
+
+
+
+    
 
 from collections import Counter
 

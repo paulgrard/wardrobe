@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^setGenerating/(?P<generatingState>\d+)$', views.setGenerating, name='setGenerating'),
     url(r'^generateOutfit/$', views.generateOutfit, name='generateOutfit'),
     url(r'^switchClothe/(?P<idC>\d+)/(?P<way>\d+)$', views.switchClothe, name='switchClothe'),
+    url(r'^getOutfitSettings/$', views.getOutfitSettings, name='getOutfitSettings'),
 ]
