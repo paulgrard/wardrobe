@@ -321,10 +321,10 @@ def getAllClothes(request):
 def getClothe(request, idC):
     data = {}
     infos = {}
-    themes = {}
     success = False
     currentUser = request.user
     clothInfo = []
+    colors = []
 
     if currentUser.is_authenticated():
         cloth = get_object_or_404(Clothe, id = idC)
@@ -335,11 +335,9 @@ def getClothe(request, idC):
         infos['state'] = cloth.state
         infos['category'] = cloth.category.name
         infos['categoryId'] = cloth.category.id
+        infos['area'] = cloth.category.area
 
-        
-        for t in cloth.themes.all():
-            themes[t.id] = t.name
-        infos['themes'] = themes
+        infos['themes'] = [{"id":t.id, "name":t.name} for t in cloth.themes.all()]
 
         for c in cloth.colors.all():
             infos_color = {}
@@ -350,8 +348,9 @@ def getClothe(request, idC):
                     infos_color['id'] = c.id
                     infos_color['name'] = c.name
                     infos_color['quantity'] = q.quantity
+                    colors.append(infos_color)
             
-        infos['color'] = infos_color
+        infos['colors'] = colors
         data['infos'] = infos
         success = True
     else:
