@@ -1718,7 +1718,7 @@ def generateOutfit(request):
 
             ####################
             form = OutfitGenerationForm()
-            return render(request, 'dressingManage/generateOutfit.html', locals())
+            #return render(request, 'dressingManage/generateOutfit.html', locals())
             ####################
 
             data['message'] = 'Une requête POST est nécessaire.'
