@@ -721,11 +721,14 @@ def generateOutfit(request):
                 except Outfit.DoesNotExist:
                     outfit = Outfit(userOwner = currentUser)
                     outfit.save()'''
+                
+                
+                
                 outfit, created = Outfit.objects.get_or_create(userOwner = currentUser)
                 
                 outfit.generating = True
-                outfit.save()
 
+                
                     
                 lon = form.cleaned_data["lon"]
                 lat = form.cleaned_data["lat"]
@@ -776,6 +779,13 @@ def generateOutfit(request):
                     outfitLayers = 1
                 else:
                     outfitLayers = 2
+
+
+                outfit.nbrLayer = outfitLayers
+                outfit.theme = thm
+                outfit.save()
+
+                
 
                 ptsTop = 0
                 ptsPant = 0
@@ -855,6 +865,7 @@ def generateOutfit(request):
                     ptsVarious = 35
                     
 
+
                 
                 #############################################
                     
@@ -864,7 +875,7 @@ def generateOutfit(request):
 
                     ptsFirst = int(ptsTop/3)
                     ptsSecond = ptsTop - ptsFirst
-                                                        #appartient au user     est dans le theme        appartient à la couche 2 ou 0
+                                                            #appartient au user     est dans le theme                           appartient à la couche 2 ou 0
                     lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & (Q(category__layer = 2) | Q(category__layer = 0)))
                     
                     if lSecondLayer:
@@ -985,8 +996,11 @@ def generateOutfit(request):
 
                     # choisir le vêtement de la 1ere couche (si 2eme couche)
                     cloth = {}
+                    
                     lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(colors__id__in = lCoulIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
-
+                    # pour être sur de ne pas avoir le même que celui de la 2eme couche il faudrait Q(id != SecondLayer.id) mais s'il y est, erreur de type : 'bool' object is not iterable
+                    
+                        
                     if lFirstLayer:
                         for c in lFirstLayer:
                             #cat = Category.objects.get(id = c.category.id) # on récupère la catégorie et on calcule les points totaux des warmth de la cat et du vêt
@@ -1052,7 +1066,7 @@ def generateOutfit(request):
                         for c in lFirstLayer:
                             #cat = Category.objects.get(id = c.category.id) # on récupère la catégorie et on calcule les points totaux des warmth de la cat et du vêt
                             warmthTot = c.category.warmth * c.warmth
-                            if (warmthTot >= (ptsFirst-1)) and (warmthTot <= (ptsFirst+1)):
+                            if (warmthTot >= (ptsTop-1)) and (warmthTot <= (ptsTop+1)):
                                 lFirstLayerIds.append(c.id)  # crée la liste d'ids de vêtements possibles
 
                         if len(lFirstLayerIds) == 0:
@@ -1167,7 +1181,7 @@ def generateOutfit(request):
                         lCoulIdsCoat.append(2)
                         lCoulIdsCoat = list(set(lCoulIdsCoat))
                     else:
-                        lCoulIdsCoat = list(range(1,25))
+                        lCoulIdsCoat = lCoulIds
                     lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(category__layer = 3) & Q(colors__id__in = lCoulIdsCoat))
 
                     if lCoat:
@@ -1438,7 +1452,7 @@ def generateOutfit(request):
                 if outfitLayers == 2 and SecondLayer.id == 10:
                     flag = random.randint(0,1)
                     if flag==1:
-                        lCravat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(colors__id__in = lCoulIds) & (Q(category__id = 75) | Q(category__id = 74)))
+                        lCravat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(colors__id__in = lCoulIds) & (Q(category__id = 75) | Q(category__id = 76)))
                         if lCravat:
                             lCravatIds = [c.id for c in lCravat]
                             cravat = Clothe.objects.get(id = random.choice(lCravatIds))
@@ -1458,10 +1472,14 @@ def generateOutfit(request):
                 clothesToPush = []
                 
                 if SecondLayer!=-1:
-                    clothesToPush.append(SecondLayer)
+                    outfit.secondLayer = SecondLayer
+                    outfit.save()
+                    #clothesToPush.append(SecondLayer)
                     
                 if FirstLayer!=-1:
-                    clothesToPush.append(FirstLayer)
+                    outfit.firstLayer = FirstLayer
+                    outfit.save()
+                    #clothesToPush.append(FirstLayer)
                     
                 if pant!=-1:
                     clothesToPush.append(pant)
@@ -1506,6 +1524,15 @@ def generateOutfit(request):
                     clothesToPush.append(cravat)
 
                 outfit.clothes.set(clothesToPush)
+                outfit.nbrLayer = outfitLayers
+                #outfit.temp = temp
+                outfit.ptsTop = ptsTop
+                outfit.ptsPant = ptsPant
+                outfit.ptsCoat = ptsCoat
+                outfit.ptsShoes = ptsShoes
+                outfit.ptsVarious = ptsVarious
+                outfit.weather = weatherDescription
+                outfit.save()
                 
                 
                 
@@ -1528,3 +1555,566 @@ def generateOutfit(request):
 
     data['success'] = success
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def switchClothe(request, idC, way):
+    data = {}
+    success = False
+    currentUser = request.user
+    lColIds = []
+    lColPantIds = []
+    flagSecond = 0
+    flagFirst = 0
+    clothToReturn = -1
+
+    if currentUser.is_authenticated():
+        outfit = get_object_or_404(Outfit, userOwner = currentUser)
+
+        for c in outfit.clothes.all():
+            
+            if c.category.area == 2: # si pantalon
+                lColPant = c.colors
+                for col in lColPant.all():
+                    quant = Quantity.objects.get(id = c.quantities.all(), color = col)
+
+                    if quant.quantity >= 20:   
+                        if col.id == 1 or col.id == 2: # si noir ou blanc 
+                            if len(lColIds) == 0: # et si liste vide on ajoute tout
+                                lColPantIds = list(range(1, 25))
+
+                        else: #si pas noir ni blc
+                            pat = Pattern.objects.get(id = col.id) # on récupère le pattern correspondant
+                            if len(lColPantIds) == 0: # si liste vide on ajoute les couleurs
+                                for color in pat.colors.all():
+                                    lColPantIds.append(color.id)
+                            else: # sinon on ajoute les couleurs
+                                for color in pat.colors.all():
+                                    lColPantIds.append(color.id)
+                
+            if c.id != int(idC):
+                lCol = c.colors
+                for col in lCol.all():
+                    quant = Quantity.objects.get(id = c.quantities.all(), color = col)
+
+                    if quant.quantity >= 20:   
+                        if col.id == 1 or col.id == 2: # si noir ou blanc 
+                            if len(lColIds) == 0: # et si liste vide on ajoute tout
+                                lColIds = list(range(1, 25))
+
+                        else: #si pas noir ni blc
+                            pat = Pattern.objects.get(id = col.id) # on récupère le pattern correspondant
+                            if len(lColIds) == 0: # si liste vide on ajoute les couleurs
+                                for color in pat.colors.all():
+                                    lColIds.append(color.id)
+                            else: # sinon on ajoute les couleurs 
+                                for color in pat.colors.all():
+                                    lColIds.append(color.id)
+
+        if outfit.secondLayer.id == int(idC):
+            flagSecond = 1
+        else:
+            for col in outfit.secondLayer.colors.all():
+                quant = Quantity.objects.get(id = outfit.secondLayer.quantities.all(), color = col)
+
+                if quant.quantity >= 20:   
+                    if col.id == 1 or col.id == 2: # si noir ou blanc 
+                        if len(lColIds) == 0: # et si liste vide on ajoute tout
+                            lColIds = list(range(1, 25))
+
+                    else: #si pas noir ni blc
+                        pat = Pattern.objects.get(id = col.id) # on récupère le pattern correspondant
+                        if len(lColIds) == 0: # si liste vide on ajoute les couleurs
+                            for color in pat.colors.all():
+                                lColIds.append(color.id)
+                        else: # sinon on ajoute les couleurs 
+                            for color in pat.colors.all():
+                                lColIds.append(color.id)
+
+
+        if outfit.firstLayer.id == int(idC):
+            flagFirst = 1
+        else:
+            for col in outfit.firstLayer.colors.all():
+                quant = Quantity.objects.get(id = outfit.firstLayer.quantities.all(), color = col)
+
+                if quant.quantity >= 20:   
+                    if col.id == 1 or col.id == 2: # si noir ou blanc 
+                        if len(lColIds) == 0: # et si liste vide on ajoute tout
+                            lColIds = list(range(1, 25))
+
+                    else: #si pas noir ni blc
+                        pat = Pattern.objects.get(id = col.id) # on récupère le pattern correspondant
+                        if len(lColIds) == 0: # si liste vide on ajoute les couleurs
+                            for color in pat.colors.all():
+                                lColIds.append(color.id)
+                        else: # sinon on ajoute les couleurs 
+                            for color in pat.colors.all():
+                                lColIds.append(color.id)
+
+            
+        counts = Counter(lColIds)
+        lColIds = [value for value, count in counts.items() if count > 1]
+        lColIds.append(1)
+        lColIds.append(2)
+        lColIds = list(set(lColIds))
+
+
+
+        ptsTop = outfit.ptsTop
+        ptsPant = outfit.ptsPant 
+        ptsCoat = outfit.ptsCoat 
+        ptsShoes = outfit.ptsShoes
+        ptsVarious = outfit.ptsVarious 
+
+        if outfit.nbrLayer == 2:
+            ptsFirst = int(ptsTop/3)
+            ptsSecond = ptsTop - ptsFirst
+
+        
+
+        if flagSecond == 1:
+            #on récupère tous les vêt qui sont potentiellement compatibles
+            lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__layer = 2) | Q(category__layer = 0)) & Q(id != outfit.firstLayer.id))
+            lSecondLayerIds = []
+            if lSecondLayer:
+                #on ne selectionne que ceux qui match avec la temp
+                for c in lSecondLayer:
+                    warmthTot = c.category.warmth * c.warmth
+                    if (warmthTot >= (ptsSecond-1)) and (warmthTot <= (ptsSecond+1)):
+                        lSecondLayerIds.append(c.id)
+
+
+                if len(lSecondLayerIds) == 0:
+                    clothToReturn = -1
+                else:
+                    #si tout est OK, on parcourt le dic et lorsqu'on trouve le vet qui est actuellement porté, on + ou - 1 selon le senspassé en param
+                    for clothe in lSecondLayerIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lSecondLayerIds[lSecondLayerIds.index(clothe)-1]
+                            else:
+                                if lSecondLayerIds.index(clothe)+1 > len(lSecondLayerIds):
+                                    clothToReturn = lSecondLayerIds[0]
+                                else:
+                                    clothToReturn = lSecondLayerIds[lSecondLayerIds.index(clothe)+1]
+            else:
+                clothToReturn = -1
+
+
+
+        elif flagFirst == 1:
+            #on récupère tous les vêt qui sont potentiellement compatibles
+            if outfit.nbrLayer == 2:
+                lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__layer = 1) | Q(category__layer = 0)) & Q(id != outfit.secondLayer.id))
+            else:
+                ptsFirst = ptsTop
+                lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
+
+                
+            if lFirstLayer:
+                lFirstLayerIds = []
+                #on ne selectionne que ceux qui match avec la temp
+                for c in lFirstLayer:
+                    warmthTot = c.category.warmth * c.warmth
+                    if (warmthTot >= (ptsFirst-1)) and (warmthTot <= (ptsFirst+1)):
+                        lFirstLayerIds.append(c.id)
+
+
+                if len(lFirstLayerIds) == 0:
+                    clothToReturn = -1
+                else:
+                    #si tout est OK, on parcourt le dic et lorsqu'on trouve le vet qui est actuellement porté, on + ou - 1 selon le senspassé en param
+                    for clothe in lFirstLayerIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lFirstLayerIds[lFirstLayerIds.index(clothe)-1]
+                            else:
+                                if lFirstLayerIds.index(clothe)+1 > len(lFirstLayerIds):
+                                    clothToReturn = lFirstLayerIds[0]
+                                else:
+                                    clothToReturn = lFirstLayerIds[lFirstLayerIds.index(clothe)+1]
+            else:
+                clothToReturn = -1
+                        
+
+        else:
+            cloth = Clothe.objects.get(id = int(idC))
+            area = cloth.category.area
+
+            #pantalon
+            
+            if area == 2:
+                lPantIds = []
+                lPant = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 2) & (Q(colors__id__in = lColIds) | Q(category__id = 31)))
+
+                if lPant:
+                    for c in lPant:
+                        warmthTot = c.category.warmth * c.warmth
+                        if (warmthTot >= (ptsPant-1)) and (warmthTot <= (ptsPant+1)):
+                            lPantIds.append(c.id)
+
+                    if len(lPantIds) == 0:
+                        clothToReturn = -1
+                    else:
+                        for clothe in lPantIds:
+                            if clothe == int(idC):
+                                if way == 0:
+                                    clothToReturn = lPantIds[lPantIds.index(clothe)-1]
+                                else:
+                                    if lPantIds.index(clothe)+1 > len(lPantIds):
+                                        clothToReturn = lPantIds[0]
+                                    else:
+                                        clothToReturn = lPantIds[lPantIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+            #chaussures
+            if area == 3:
+                if SecondLayer.id == 10: # si veste costume
+                    lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 3) & (Q(category__layer = 50) | Q(category__layer = 39) | Q(category__layer = 40)) & Q(colors__id__in = lColIds))
+                    if lShoes:
+                        lShoesIds = [c.id for c in lShoes]
+                        
+                        for clothe in lShoesIds:
+                            if shoes == int(idC):
+                                if way == 0:
+                                    clothToReturn = lShoesIds[lShoesIds.index(clothe)-1]
+                                else:
+                                    if lShoesIds.index(clothe)+1 > len(lShoesIds):
+                                        clothToReturn = lShoesIds[0]
+                                    else:
+                                        clothToReturn = lShoesIds[lShoesIds.index(clothe)+1]
+                    else:
+                        clothToReturn = -1
+
+                else: # si pas veste
+                    lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 3) & Q(colors__id__in = lColIds))
+                    if lShoes:
+                        for c in lShoes:
+                            warmthTot = c.category.warmth * c.warmth
+                            if (warmthTot >= (ptsShoes-1)) and (warmthTot <= (ptsShoes+1)):
+                                lShoesIds.append(c.id)
+
+                        if len(lShoesIds) == 0:
+                            clothToReturn = -1
+                        else:
+                            for clothe in lShoesIds:
+                                if clothe == int(idC):
+                                    if way == 0:
+                                        clothToReturn = lShoesIds[lShoesIds.index(clothe)-1]
+                                    else:
+                                        if lShoesIds.index(clothe)+1 > len(lShoesIds):
+                                            clothToReturn = lShoesIds[0]
+                                        else:
+                                            clothToReturn = lShoesIds[lShoesIds.index(clothe)+1]
+                    else:
+                        clothToReturn = -1
+
+
+
+            #manteau
+
+            if area == 1 and cloth.category.layer == 3:
+                
+                lCoatIds = []
+                
+                if len(lColPantIds) != 0:
+                    lColIdsCoat = [c for c in list(lColIds) if c not in lColPantIds]
+                    lColIdsCoat.append(1)
+                    lColIdsCoat.append(2)
+                    lColIdsCoat = list(set(lColIdsCoat))
+                else:
+                    lColIdsCoat = lColIds
+
+                lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(category__layer = 3) & Q(colors__id__in = lColIds))
+                
+                if lCoat:
+                    
+                    for c in lCoat:
+                        warmthTot = c.category.warmth * c.warmth
+                        if (warmthTot >= (ptsCoat-3)) and (warmthTot <= (ptsCoat+3)):
+                            lCoatIds.append(c.id)
+                            
+                    if len(lCoatIds) == 0:
+                        clothToReturn = -1
+                    else:
+                        for clothe in lCoatIds:
+                            if clothe == int(idC):
+                                if way == 0:
+                                    clothToReturn = lCoatIds[lCoatIds.index(clothe)-1]
+                                else:
+                                    if lCoatIds.index(clothe)+1 > len(lCoatIds):
+                                        clothToReturn = lCoatIds[0]
+                                    else:
+                                        clothToReturn = lCoatIds[lCoatIds.index(clothe)+1]
+                                        
+                else:
+                    clothToReturn = -1
+
+
+
+
+            #ss vêt
+            if area == 4 and (cloth.category.id == 58 or cloth.category.id == 57 or cloth.category.id == 56 or cloth.category.id == 55 or cloth.category.id == 54 or cloth.category.id == 53):
+                
+                lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 4) & (Q(category__id = 58) | Q(category__id = 57) | Q(category__id = 56) | Q(category__id = 55) | Q(category__id = 54) | Q(category__id = 53)))
+
+                if lUnderwear:
+                    lUnderwearIds = [c.id for c in lUnderwear]
+                    for clothe in lUnderwearIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lUnderwearIds[lUnderwearIds.index(clothe)-1]
+                            else:
+                                if lUnderwearIds.index(clothe)+1 > len(lUnderwearIds):
+                                    clothToReturn = lUnderwearIds[0]
+                                else:
+                                    clothToReturn = lUnderwearIds[lUnderwearIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+            #ss vêt top
+            if area == 4 and (cloth.category.id == 64 or cloth.category.id == 59):
+                
+                lUnderwearTop = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 4) & (Q(category__id = 64) | Q(category__id = 59)))
+
+                if lUnderwearTop:
+                    lUnderwearTopIds = [c.id for c in lUnderwearTop]
+                    for clothe in lUnderwearTopIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lUnderwearTopIds[lUnderwearTopIds.index(clothe)-1]
+                            else:
+                                if lUnderwearTopIds.index(clothe)+1 > len(lUnderwearTopIds):
+                                    clothToReturn = lUnderwearTopIds[0]
+                                else:
+                                    clothToReturn = lUnderwearTopIds[lUnderwearTopIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+            #chaussettes
+            if area == 4 and (cloth.category.id == 63 or cloth.category.id == 62 or cloth.category.id == 61 or cloth.category.id == 60):
+                
+                lSocks = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
+
+                if lSocks:
+                    lSockIds = [c.id for c in lSock]
+                    for clothe in lSockIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lSockIds[lSockIds.index(clothe)-1]
+                            else:
+                                if lSockIds.index(clothe)+1 > len(lSockIds):
+                                    clothToReturn = lSockIds[0]
+                                else:
+                                    clothToReturn = lSockIds[lSockIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+                    
+
+
+            #casquette
+            if area == 5 and cloth.category.id == 69:
+                
+                lCap = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(category__id = 69))
+
+                if lCap:
+                    lCapIds = [c.id for c in lCap]
+                    for clothe in lCapIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lCapIds[lCapIds.index(clothe)-1]
+                            else:
+                                if lCapIds.index(clothe)+1 > len(lCapIds):
+                                    clothToReturn = lCapIds[0]
+                                else:
+                                    clothToReturn = lCapIds[lCapIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+
+            #chapeau et beret
+            if area == 5 and (cloth.category.id == 68 or cloth.category.id == 70):
+                
+                lHeadgear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & (Q(category__id = 68) | Q(category__id = 70)))
+
+                if lHeadgear:
+                    lHeadgearIds = [c.id for c in lHeadgear]
+                    for clothe in lHeadgearIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lHeadgearIds[lHeadgearIds.index(clothe)-1]
+                            else:
+                                if lHeadgearIds.index(clothe)+1 > len(lHeadgearIds):
+                                    clothToReturn = lHeadgearIds[0]
+                                else:
+                                    clothToReturn = lHeadgearIds[lHeadgearIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+
+            #echarpe
+            if area == 5 and cloth.category.id == 65:
+                
+                lScarf = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(category__id = 65))
+
+                if lScarf:
+                    lScarfIds = [c.id for c in lScarf]
+                    for clothe in lScarfIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lScarfIds[lScarfIds.index(clothe)-1]
+                            else:
+                                if lScarfIds.index(clothe)+1 > len(lScarfIds):
+                                    clothToReturn = lScarfIds[0]
+                                else:
+                                    clothToReturn = lScarfIds[lScarfIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+                    
+
+
+            #gants et mitaines
+            if area == 5 and (cloth.category.id == 66 or cloth.category.id == 72):
+                
+                lGlove = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & (Q(category__id = 66) | Q(category__id = 72)))
+
+                if lGlove:
+                    lGloveIds = [c.id for c in lGlove]
+                    for clothe in lGloveIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lGloveIds[lGloveIds.index(clothe)-1]
+                            else:
+                                if lGloveIds.index(clothe)+1 > len(lGloveIds):
+                                    clothToReturn = lGloveIds[0]
+                                else:
+                                    clothToReturn = lGloveIds[lGloveIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+
+            #bonnet
+            if area == 5 and cloth.category.id == 67:
+                
+                lBonnet = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(category__id = 67))
+
+                if lBonnet:
+                    lBonnetIds = [c.id for c in lBonnet]
+                    for clothe in lBonnetIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lBonnetIds[lBonnetIds.index(clothe)-1]
+                            else:
+                                if lBonnetIds.index(clothe)+1 > len(lBonnetIds):
+                                    clothToReturn = lBonnetIds[0]
+                                else:
+                                    clothToReturn = lBonnetIds[lBonnetIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+
+            #cagoule
+            if area == 5 and cloth.category.id == 71:
+                
+                lHood = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(category__id = 71))
+
+                if lHood:
+                    lHoodIds = [c.id for c in lHood]
+                    for clothe in lHoodIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lHoodIds[lHoodIds.index(clothe)-1]
+                            else:
+                                if lHoodIds.index(clothe)+1 > len(lHoodIds):
+                                    clothToReturn = lHoodIds[0]
+                                else:
+                                    clothToReturn = lHoodIds[lHoodIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+
+            #etole foulard
+            if area == 5 and (cloth.category.id == 74 or cloth.category.id == 73):
+                
+                lFoulard = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & (Q(category__id = 74) | Q(category__id = 73)))
+
+                if lFoulard:
+                    lFoulardIds = [c.id for c in lFoulard]
+                    for clothe in lFoulardIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lFoulardIds[lFoulardIds.index(clothe)-1]
+                            else:
+                                if lFoulardIds.index(clothe)+1 > len(lFoulardIds):
+                                    clothToReturn = lFoulardIds[0]
+                                else:
+                                    clothToReturn = lFoulardIds[lFoulardIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+
+
+            #noeud pap / cravate
+            if area == 5 and (cloth.category.id == 75 or cloth.category.id == 76):
+                
+                lCravat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__id = 75) | Q(category__id = 76)))
+
+                if lCravat:
+                    lCravatIds = [c.id for c in lCravat]
+                    for clothe in lCravatIds:
+                        if clothe == int(idC):
+                            if way == 0:
+                                clothToReturn = lCravatIds[lCravatIds.index(clothe)-1]
+                            else:
+                                if lCravatIds.index(clothe)+1 > len(lCravatIds):
+                                    clothToReturn = lCravatIds[0]
+                                else:
+                                    clothToReturn = lCravatIds[lCravatIds.index(clothe)+1]
+                else:
+                    clothToReturn = -1
+
+
+        info = {}
+
+        if clothToReturn != -1:
+            info['id'] = clothToReturn
+            clothPhoto = Clothe.objects.get(id = clothToReturn)
+            info['photo'] = clothPhoto.photo
+            data['clothe'] = info
+
+            newCloth = Clothe.objects.get(id = clothToReturn)
+
+            if flagSecond == 1:
+                outfit.secondLayer.set(newCloth)
+            elif flagFirst == 1:
+                outfit.firstLayer.set(newCloth)
+            else:
+                outfit.clothes.add(newCloth)
+                outfit.clothes.remove(cloth)
+                
+            
+            success = True
+        else:
+            data['success'] = success
+            data['message'] = "Erreur lors de la récupération du vêtement"
+        
+        
+            
+    else:
+        return HttpResponseForbidden('Utilisateur non authentifié')
+
+    data['success'] = success
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+

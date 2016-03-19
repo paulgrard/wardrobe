@@ -57,9 +57,20 @@ class Pattern(models.Model):
         return self.name
 
 class Outfit(models.Model):
+    firstLayer = models.OneToOneField(Clothe, related_name="firstLayer_outfit", blank = True, null = True)
+    secondLayer = models.OneToOneField(Clothe, related_name="secondLayer_outfit", blank = True, null = True)
     clothes = models.ManyToManyField(Clothe, blank = True)
-    userOwner = models.OneToOneField(User, blank = True, null = True)
+    userOwner = models.OneToOneField(User, null = True)
     generating = models.NullBooleanField()
+    nbrLayer = models.PositiveIntegerField(null = True)
+    #temp = models.PositiveIntegerField(null = True)
+    weather = models.CharField(max_length=30, null = True)
+    ptsTop = models.PositiveIntegerField(null = True)
+    ptsPant = models.PositiveIntegerField(null = True)
+    ptsCoat = models.PositiveIntegerField(null = True)
+    ptsShoes = models.PositiveIntegerField(null = True)
+    ptsVarious = models.PositiveIntegerField(null = True)
+    theme = models.OneToOneField(Theme, null = True)
 
     def __str__(self):
         return self.userOwner.username

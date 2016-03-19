@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^changeState/(?P<idC>\d+)/(?P<state>\d+)$', views.changeState, name='changeState'),
     url(r'^setGenerating/(?P<generatingState>\d+)$', views.setGenerating, name='setGenerating'),
     url(r'^generateOutfit/$', views.generateOutfit, name='generateOutfit'),
+    url(r'^switchClothe/(?P<idC>\d+)/(?P<way>\d+)$', views.switchClothe, name='switchClothe'),
 ]
