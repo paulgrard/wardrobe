@@ -27,7 +27,7 @@ for x in lignes:
         newPat = Pattern(name = n)
         newPat.save()
         for y in temp:
-            newPat.color.add(y)
+            newPat.colors.add(y)
         n=''
         c=''
     print(temp)
