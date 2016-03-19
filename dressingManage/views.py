@@ -74,12 +74,16 @@ def addClothe(request):
                         except Theme.DoesNotExist:
                             data['success'] = False
                             data['message'] = 'Un des thèmes n\'existe pas.'
-
+                            newClothe.themes.remove()
+                            newClothe.delete()
+                            os.remove(IMG_FOLDER + photoName)
                             return HttpResponse(json.dumps(data), content_type='application/json')
 
                 #for valColor in colorsC:
                 if len(colorsC)>3 or len(quantitiesC)>3:
                     data['success'] = False
+                    newClothe.delete()
+                    os.remove(IMG_FOLDER + photoName)
                     data['message'] = 'Plus de 3 couleurs ou 3 quantitées passées en paramètres.'
 
                     return HttpResponse(json.dumps(data), content_type='application/json')
@@ -101,13 +105,17 @@ def addClothe(request):
                             newClothe.colors.add(col)'''
                             data['success'] = False
                             data['message'] = 'Une des couleurs n\'existe pas.'
+                            newClothe.colors.remove()
+                            newClothe.delete()
+                            os.remove(IMG_FOLDER + photoName)
+                            return HttpResponse(json.dumps(data), content_type='application/json')
 
                 if newClothe:
                     success = True
                 else:
                     data['message'] = 'Erreur lors de la création du vêtement.'
 
-
+                
 
             else: # si form non valide
                 data['message'] = 'Formulaire non valide.'
