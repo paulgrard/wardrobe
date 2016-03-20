@@ -30,7 +30,7 @@ def connection(request):
             return HttpResponse(json.dumps(data), content_type='application/json')
         form = ConnectionForm()
 
-    #return render(request, 'connection/connection.html', locals())
+    return render(request, 'connection/connection.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def getToken(request):

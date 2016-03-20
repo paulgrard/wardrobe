@@ -746,7 +746,7 @@ def getOutfitSettings(request):
     data = {}
     info = {}
     various = []
-    temp = {}
+    
     success = False
     currentUser = request.user
 
@@ -755,6 +755,7 @@ def getOutfitSettings(request):
         outfit = get_object_or_404(Outfit, userOwner = currentUser)
 
         if outfit.firstLayer:
+            temp = {}
             temp['id'] = outfit.firstLayer.id
             temp['photo'] = outfit.firstLayer.photo
             info['firstLayer'] = temp
@@ -763,6 +764,7 @@ def getOutfitSettings(request):
 
 
         if outfit.secondLayer:
+            temp = {}
             temp['id'] = outfit.secondLayer.id
             temp['photo'] = outfit.secondLayer.photo
             info['secondLayer'] = temp
@@ -771,6 +773,7 @@ def getOutfitSettings(request):
 
         
         if outfit.pant:
+            temp = {}
             temp['id'] = outfit.pant.id
             temp['photo'] = outfit.pant.photo
             info['pant'] = temp
@@ -779,6 +782,7 @@ def getOutfitSettings(request):
 
         
         if outfit.shoes:
+            temp = {}
             temp['id'] = outfit.shoes.id
             temp['photo'] = outfit.shoes.photo
             info['shoes'] = temp
@@ -787,14 +791,16 @@ def getOutfitSettings(request):
 
         
         if outfit.coat:
+            temp = {}
             temp['id'] = outfit.coat.id
             temp['photo'] = outfit.coat.photo
-            info['firstLayer'] = temp
+            info['coat'] = temp
         else:
-            info['firstLayer'] = -1
+            info['coat'] = -1
 
         
         if outfit.underwear:
+            temp = {}
             temp['id'] = outfit.underwear.id
             temp['photo'] = outfit.underwear.photo
             info['underwear'] = temp
@@ -803,6 +809,7 @@ def getOutfitSettings(request):
 
         
         if outfit.underwearTop:
+            temp = {}
             temp['id'] = outfit.underwearTop.id
             temp['photo'] = outfit.underwearTop.photo
             info['underwearTop'] = temp
@@ -811,6 +818,7 @@ def getOutfitSettings(request):
 
         
         if outfit.sock:
+            temp = {}
             temp['id'] = outfit.sock.id
             temp['photo'] = outfit.sock.photo
             info['sock'] = temp
@@ -818,8 +826,11 @@ def getOutfitSettings(request):
             info['sock'] = -1
             
         for c in outfit.various.all():
+            variousTemp = {}
             cloth = Clothe.objects.get(id = c.id, user = currentUser)
-            various.append(c.id)
+            variousTemp['id'] = c.id
+            variousTemp['photo'] = c.photo
+            various.append(variousTemp)
             
         info['various'] = various
         info['generating'] = outfit.generating
