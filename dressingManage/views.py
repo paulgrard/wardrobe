@@ -924,7 +924,6 @@ def generateOutfit(request):
                 #"light rain"
                 data["weather"] = weather
 
-                
                 # récupère thèmes
                 if themesC:
                     try:
@@ -1220,10 +1219,10 @@ def generateOutfit(request):
                 # choisir le vêtement de la 1ere couche (si pas 2eme couche)
                 else:
                     cloth = {}
-                    SecondLayer = -1
-                    #data['secondLayer'] = SecondLayer
                     lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & (Q(category__layer = 1) | Q(category__layer = 0)))
 
+
+                    cloth = {}
                     if lFirstLayer:
                         for c in lFirstLayer:
                             #cat = Category.objects.get(id = c.category.id) # on récupère la catégorie et on calcule les points totaux des warmth de la cat et du vêt
@@ -1365,18 +1364,23 @@ def generateOutfit(request):
                         coat = -1
                         cloth['id'] = coat
 
-                else:
-                    if weatherDescription == "Rain":
+                    tempo['coat'] = cloth
+
+                elif weather == "Rain":
                         
-                        lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(category__layer = 3) & Q(category__id = 25))
+                    lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(category__layer = 3) & Q(category__id = 25))
+                    
 
-                        if lCoat:
-                            coat = Clothe.objects.get(id = random.choice(lCoat.id))
-                        else:
-                            coat = -1
-                            cloth['id'] = coat
+                    if lCoat:
+                        coat = Clothe.objects.get(id = random.choice(lCoat.id))
+                        cloth['id'] = coat.id
+                        cloth['photo'] = coat.photo
+                    else:
+                        coat = -1
+                        cloth['id'] = coat
 
-                tempo['coat'] = cloth
+
+                    tempo['coat'] = cloth
 
 
 
@@ -1387,7 +1391,7 @@ def generateOutfit(request):
 
                 cloth = {}
 
-                if SecondLayer.id == 10: # si veste costume
+                if (type(SecondLayer) is not int) and SecondLayer.id == 10: # si veste costume
                     lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 3) & (Q(category__layer = 50) | Q(category__layer = 39) | Q(category__layer = 40)) & Q(colors__id__in = lCoulIds))
                     if lShoes:
                         lShoesIds = [c.id for c in lShoes]
@@ -1470,18 +1474,45 @@ def generateOutfit(request):
 
 
                     #generation des chaussettes, bas, collants ....
+                    cloth = {}
+                    if shoes.categoy.id == 40 or shoes.categoy.id == 42 or shoes.categoy.id == 47:
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 62) | Q(category__id = 61)))
+                        
+                        if lSock:
+                            lSockIds = [c.id for c in lSock]
+                            sock = Clothe.objects.get(id = random.choice(lSockIds))
+                            cloth['id'] = sock.id
+                            cloth['photo'] = sock.photo
+                        else:
+                            cloth['id'] = -1
 
-                    lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
-                    
-                    if lSock:
-                        lSockIds = [c.id for c in lSock]
-                        sock = Clothe.objects.get(id = random.choice(lSockIds))
-                        cloth['id'] = sock.id
-                        cloth['photo'] = sock.photo
-                    else:
-                        cloth['id'] = -1
+                        tempo['sock'] = cloth
+                        
+                    elif shoes.categoy.id == 38 or shoes.categoy.id == 39 or shoes.categoy.id == 45 or shoes.categoy.id == 46 or shoes.categoy.id == 50 or shoes.categoy.id == 51 or shoes.categoy.id == 52:
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
+                        
+                        if lSock:
+                            lSockIds = [c.id for c in lSock]
+                            sock = Clothe.objects.get(id = random.choice(lSockIds))
+                            cloth['id'] = sock.id
+                            cloth['photo'] = sock.photo
+                        else:
+                            cloth['id'] = -1
 
-                    tempo['sock'] = cloth
+                        tempo['sock'] = cloth
+                        
+                    elif shoes == -1:
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
+                        
+                        if lSock:
+                            lSockIds = [c.id for c in lSock]
+                            sock = Clothe.objects.get(id = random.choice(lSockIds))
+                            cloth['id'] = sock.id
+                            cloth['photo'] = sock.photo
+                        else:
+                            cloth['id'] = -1
+
+                        tempo['sock'] = cloth
 
                     
                 else: #si homme
@@ -1501,18 +1532,34 @@ def generateOutfit(request):
                     tempo['underwear'] = cloth
 
                     
-                    #generation chaussettes 
-                    lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 60)))
-                    
-                    if lSock:
-                        lSockIds = [c.id for c in lSock]
-                        sock = Clothe.objects.get(id = random.choice(lSockIds))
-                        cloth['id'] = sock.id
-                        cloth['photo'] = sock.photo
-                    else:
-                        cloth['id'] = -1
+                    #generation chaussettes
+                    cloth = {}
+                    if type(shoes) is not int and (shoes.categoy.id == 38 or shoes.categoy.id == 39 or shoes.categoy.id == 45 or shoes.categoy.id == 46 or shoes.categoy.id == 50 or shoes.categoy.id == 51 or shoes.categoy.id == 52):
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 60)))
+                        
+                        if lSock:
+                            lSockIds = [c.id for c in lSock]
+                            sock = Clothe.objects.get(id = random.choice(lSockIds))
+                            cloth['id'] = sock.id
+                            cloth['photo'] = sock.photo
+                        else:
+                            cloth['id'] = -1
 
-                    tempo['sock'] = cloth
+                        tempo['sock'] = cloth
+                        
+                    elif shoes == -1:
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 60)))
+                        
+                        if lSock:
+                            lSockIds = [c.id for c in lSock]
+                            sock = Clothe.objects.get(id = random.choice(lSockIds))
+                            cloth['id'] = sock.id
+                            cloth['photo'] = sock.photo
+                        else:
+                            cloth['id'] = -1
+
+                        tempo['sock'] = cloth
+                        
 
                 ###################################
 
@@ -1636,7 +1683,7 @@ def generateOutfit(request):
                         various.append(cloth)
 
                             
-
+                #préparation des data pour le rturn
                 if len(various)!=0:
                     tempo['various']=various
                 
@@ -1647,7 +1694,7 @@ def generateOutfit(request):
                 
                 clothesToPush = []
                 
-                if SecondLayer!=-1:
+                if SecondLayer != -1:
                     outfit.secondLayer = SecondLayer
                     #outfit.save()
                     #clothesToPush.append(SecondLayer)
@@ -1729,7 +1776,7 @@ def generateOutfit(request):
 
             ####################
             form = OutfitGenerationForm()
-            #return render(request, 'dressingManage/generateOutfit.html', locals())
+            return render(request, 'dressingManage/generateOutfit.html', locals())
             ####################
 
             data['message'] = 'Une requête POST est nécessaire.'
