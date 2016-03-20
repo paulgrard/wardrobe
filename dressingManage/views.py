@@ -1431,7 +1431,7 @@ def generateOutfit(request):
                 cloth = {}
                 
                 param = Parameters.objects.get(user = currentUser)
-                if param.sex == 1: #si femme
+                if param.sex == 2: #si femme
                     lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 58) | Q(category__id = 56) | Q(category__id = 55) | Q(category__id = 54) | Q(category__id = 53)))
 
                     if lUnderwear:
