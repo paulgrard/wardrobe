@@ -2038,14 +2038,12 @@ def switchClothe(request, idC, way):
                                 else:
                                     clothToReturn = lSecondLayerIds[lSecondLayerIds.index(clothe)-1]
                             else:
-                                if lSecondLayerIds.index(clothe)+1 > len(lSecondLayerIds-1):
+                                if lSecondLayerIds.index(clothe)+1 > len(lSecondLayerIds)-1:
                                     clothToReturn = lSecondLayerIds[0]
                                 else:
                                     clothToReturn = lSecondLayerIds[lSecondLayerIds.index(clothe)+1]
             else:
                 clothToReturn = -1
-            newCloth = Clothe.objects.get(id = clothToReturn)
-            outfit.secondLayer.set(newCloth)
 
 
         if flagFirst == 1:
