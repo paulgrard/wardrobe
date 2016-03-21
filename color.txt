@@ -3,23 +3,23 @@ Blanc
 Noir
 #000000
 Rouge
-#FF0000
+#E20F10
 Pourpre
 #9E0E40
 Violet
 #660099
 Indigo
-#791CF8
+#6621C5
 Bleu
-#0000FF
+#000088
 Turquoise
-#25FDE9
-Vert
-#00FF00
+#2DB6DC
+Bleu jean
+#3D5987
 Vert pomme
 #34C924
 Jaune
-#FFFF00
+#FFFF6F
 Ocre
 #DFAF2C
 Orange

@@ -4,4 +4,3 @@ wardrobe/settings.py
 */**/**/*.pyc
 .idea/
 __pycache__/
-static/img/*

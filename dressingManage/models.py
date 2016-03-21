@@ -57,15 +57,27 @@ class Pattern(models.Model):
         return self.name
 
 class Outfit(models.Model):
-    clothes = models.ForeignKey(Clothe, blank = True, null = True)
-    wearing = models.NullBooleanField()
+    firstLayer = models.OneToOneField(Clothe, related_name="firstLayer_outfit", null = True)
+    secondLayer = models.OneToOneField(Clothe, related_name="secondLayer_outfit", null = True)
+    pant = models.OneToOneField(Clothe, related_name="pant_outfit", null = True)
+    shoes = models.OneToOneField(Clothe, related_name="shoes_outfit", null = True)
+    coat = models.OneToOneField(Clothe, related_name="coat_outfit", null = True)
+    underwear = models.OneToOneField(Clothe, related_name="underwear_outfit", null = True)
+    underwearTop = models.OneToOneField(Clothe, related_name="underwearTop_outfit", null = True)
+    sock = models.OneToOneField(Clothe, related_name="sock", null = True)
+
+    various = models.ManyToManyField(Clothe, blank = True)
+    userOwner = models.OneToOneField(User, null = True)
+    generating = models.NullBooleanField()
+    nbrLayer = models.PositiveIntegerField(null = True)
+    #temp = models.PositiveIntegerField(null = True)
+    weather = models.CharField(max_length=30, null = True)
+    ptsTop = models.PositiveIntegerField(null = True)
+    ptsPant = models.PositiveIntegerField(null = True)
+    ptsCoat = models.PositiveIntegerField(null = True)
+    ptsShoes = models.PositiveIntegerField(null = True)
+    ptsVarious = models.PositiveIntegerField(null = True)
+    theme = models.OneToOneField(Theme, null = True)
 
     def __str__(self):
-        return self.clothes
-
-class outfitStorage(models.Model):
-    clothes = models.ForeignKey(Clothe, blank = True, null = True)
-    userOwner = models.OneToOneField(User, blank = True, null = True)
-
-    def __str__(self):
-        return self.userOwner.name
+        return self.userOwner.username
