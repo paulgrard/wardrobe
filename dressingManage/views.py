@@ -1910,8 +1910,8 @@ def switchClothe(request, idC, way):
 
                 if quant.quantity >= 20:   
                     if col.id == 1 or col.id == 2: # si noir ou blanc 
-                        #if len(lColPantIds) == 0: # et si liste vide on ajoute tout
-                        lColPantIds += list(range(1, 25))
+                        if len(lColPantIds) == 0: # et si liste vide on ajoute tout
+                            lColPantIds == list(range(1, 25))
 
                         if len(lColIds) == 0: # et si autre liste vide on ajoute tout
                             lColIds = list(range(1, 25))
