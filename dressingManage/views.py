@@ -129,7 +129,7 @@ def addClothe(request):
         return HttpResponseForbidden('Utilisateur non authentifié')
 
     data['success'] = success
-    #return render(request, 'dressingManage/addClothe.html', locals())
+    return render(request, 'dressingManage/addClothe.html', locals())
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
