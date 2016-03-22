@@ -1733,7 +1733,7 @@ def generateOutfit(request):
                     outfit.underwear = underwear
                     #clothesToPush.append(SecondLayer)
                     
-                if underwearTop!=-1:
+                if underwearTop!=-1 and param.sex == 2:
                     outfit.underwearTop = underwearTop
                     #clothesToPush.append(underwearTop)
                     
