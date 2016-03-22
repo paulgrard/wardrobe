@@ -1037,7 +1037,7 @@ def generateOutfit(request):
                     ptsFirst = int(ptsTop/3)
                     ptsSecond = ptsTop - ptsFirst
                                                             #appartient au user     est dans le theme                           appartient à la couche 2 ou 0
-                    lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & (Q(category__layer = 2) | Q(category__layer = 0)))
+                    lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(state =0) & (Q(category__layer = 2) | Q(category__layer = 0)))
                     
                     if lSecondLayer:
                         for c in lSecondLayer:
@@ -1107,7 +1107,7 @@ def generateOutfit(request):
                     if SecondLayer == -1:
                         lCoulIds = list(range(1, 25))
                                                                                                                                             #jeans id = 31                    
-                    lPant = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 2) & (Q(colors__id__in = lCoulIds) | Q(category__id = 31)))
+                    lPant = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 2) & Q(state =0) & (Q(colors__id__in = lCoulIds) | Q(category__id = 31)))
 
                     if lPant:
                         for c in lPant:
@@ -1163,7 +1163,7 @@ def generateOutfit(request):
                     # choisir le vêtement de la 1ere couche (si 2eme couche)
                     cloth = {}
                     
-                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(colors__id__in = lCoulIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
+                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(colors__id__in = lCoulIds) & Q(state =0) & (Q(category__layer = 1) | Q(category__layer = 0)))
                     # pour être sur de ne pas avoir le même que celui de la 2eme couche il faudrait Q(id != SecondLayer.id) mais s'il y est, erreur de type : 'bool' object is not iterable
                     
                         
@@ -1228,7 +1228,7 @@ def generateOutfit(request):
                 # choisir le vêtement de la 1ere couche (si pas 2eme couche)
                 else:
                     cloth = {}
-                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & (Q(category__layer = 1) | Q(category__layer = 0)))
+                    lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(state =0) & (Q(category__layer = 1) | Q(category__layer = 0)))
 
 
                     cloth = {}
@@ -1285,7 +1285,7 @@ def generateOutfit(request):
                     
                 # génération du pantalon
                     cloth = {}
-                    lPant = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 2) & (Q(colors__id__in = lCoulIds) | Q(category__id = 31)))
+                    lPant = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 2) & Q(state =0) & (Q(colors__id__in = lCoulIds) | Q(category__id = 31)))
 
                     if lPant:
                         for c in lPant:
@@ -1356,7 +1356,7 @@ def generateOutfit(request):
                         lCoulIdsCoat = list(set(lCoulIdsCoat))
                     else:
                         lCoulIdsCoat = lCoulIds
-                    lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(category__layer = 3) & Q(colors__id__in = lCoulIdsCoat))
+                    lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(state =0) & Q(category__layer = 3) & Q(colors__id__in = lCoulIdsCoat))
 
                     if lCoat:
                         for c in lCoat:
@@ -1381,7 +1381,7 @@ def generateOutfit(request):
 
                 elif weather == "Rain":
                         
-                    lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(category__layer = 3) & Q(category__id = 25))
+                    lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 1) & Q(state =0) & Q(category__layer = 3) & Q(category__id = 25))
                     
 
                     if lCoat:
@@ -1405,7 +1405,7 @@ def generateOutfit(request):
                 cloth = {}
 
                 if (type(SecondLayer) is not int) and SecondLayer.id == 10: # si veste costume
-                    lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 3) & (Q(category__layer = 50) | Q(category__layer = 39) | Q(category__layer = 40)) & Q(colors__id__in = lCoulIds))
+                    lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 3) & Q(state =0) & (Q(category__layer = 50) | Q(category__layer = 39) | Q(category__layer = 40)) & Q(colors__id__in = lCoulIds))
                     if lShoes:
                         lShoesIds = [c.id for c in lShoes]
                         shoes = Clothe.objects.get(id = random.choice(lShoesIds))
@@ -1416,7 +1416,7 @@ def generateOutfit(request):
                         cloth['id'] = -1
 
                 else:
-                    lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 3) & Q(colors__id__in = lCoulIds))
+                    lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 3) & Q(state =0) & Q(colors__id__in = lCoulIds))
                     if lShoes:
                         for c in lShoes:
                             warmthTot = c.category.warmth * c.warmth
@@ -1445,7 +1445,7 @@ def generateOutfit(request):
                 
                 param = Parameters.objects.get(user = currentUser)
                 if param.sex == 2: #si femme
-                    lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 58) | Q(category__id = 56) | Q(category__id = 55) | Q(category__id = 54) | Q(category__id = 53)))
+                    lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 58) | Q(category__id = 56) | Q(category__id = 55) | Q(category__id = 54) | Q(category__id = 53)))
 
                     if lUnderwear:
                         lUnderwearIds = [c.id for c in lUnderwear]
@@ -1466,14 +1466,14 @@ def generateOutfit(request):
                     
                     #select top en fonction des couleurs
                     cloth = {}
-                    lUnderwearTop = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 59) | Q(category__id = 64)) & Q(colors__id__in = lCoulIdsUnderwear))
+                    lUnderwearTop = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 59) | Q(category__id = 64)) & Q(colors__id__in = lCoulIdsUnderwear))
 
                     if lUnderwearTop:
                         lUnderwearTopIds = [c.id for c in lUnderwearTop]
                         underwearTop = Clothe.objects.get(id = random.choice(lUnderwearTopIds))
                         cloth['id'] = underwearTop.id
                     else: # si il n'y a rien on essaye sans les couleurs
-                        lUnderwearTop = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 59) | Q(category__id = 64)))
+                        lUnderwearTop = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 59) | Q(category__id = 64)))
 
                         if lUnderwearTop:
                             lUnderwearTopIds = [c.id for c in lUnderwearTop]
@@ -1489,7 +1489,7 @@ def generateOutfit(request):
                     #generation des chaussettes, bas, collants ....
                     cloth = {}
                     if shoes != -1 and (shoes.categoy.id == 40 or shoes.categoy.id == 42 or shoes.categoy.id == 47):
-                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 62) | Q(category__id = 61)))
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 62) | Q(category__id = 61)))
                         
                         if lSock:
                             lSockIds = [c.id for c in lSock]
@@ -1502,7 +1502,7 @@ def generateOutfit(request):
                         tempo['sock'] = cloth
                         
                     elif shoes != -1 and (shoes.categoy.id == 38 or shoes.categoy.id == 39 or shoes.categoy.id == 45 or shoes.categoy.id == 46 or shoes.categoy.id == 50 or shoes.categoy.id == 51 or shoes.categoy.id == 52):
-                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
                         
                         if lSock:
                             lSockIds = [c.id for c in lSock]
@@ -1515,7 +1515,7 @@ def generateOutfit(request):
                         tempo['sock'] = cloth
                         
                     else:
-                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
                         
                         if lSock:
                             lSockIds = [c.id for c in lSock]
@@ -1531,7 +1531,7 @@ def generateOutfit(request):
                 else: #si homme
                     cloth = {}
                     
-                    lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 58) | Q(category__id = 57) | Q(category__id = 56)))
+                    lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 58) | Q(category__id = 57) | Q(category__id = 56)))
 
                     if lUnderwear:
                         lUnderwearIds = [c.id for c in lUnderwear]
@@ -1548,7 +1548,7 @@ def generateOutfit(request):
                     #generation chaussettes
                     cloth = {}
                     if type(shoes) is not int and (shoes.categoy.id == 38 or shoes.categoy.id == 39 or shoes.categoy.id == 45 or shoes.categoy.id == 46 or shoes.categoy.id == 50 or shoes.categoy.id == 51 or shoes.categoy.id == 52):
-                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 60)))
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 63) | Q(category__id = 60)))
                         
                         if lSock:
                             lSockIds = [c.id for c in lSock]
@@ -1561,7 +1561,7 @@ def generateOutfit(request):
                         tempo['sock'] = cloth
                         
                     elif shoes == -1:
-                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 60)))
+                        lSock = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 63) | Q(category__id = 60)))
                         
                         if lSock:
                             lSockIds = [c.id for c in lSock]
@@ -1581,7 +1581,7 @@ def generateOutfit(request):
                 cloth = {}
                 # casquette
                 if weatherDescription == "Clear" and temp>25:
-                    lCap = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(category__id = 69))
+                    lCap = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & Q(category__id = 69))
                     if lCap:
                         lCapIds = [c.id for c in lCap]
                         cap = Clothe.objects.get(id = random.choice(lCapIds))
@@ -1598,7 +1598,7 @@ def generateOutfit(request):
                 if weatherDescription == "Clear" and temp<25 and temp >8:
                     flag = random.randint(0,1)
                     if flag==1:
-                        lHeadgear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & (Q(category__id = 68) | Q(category__id = 70)))
+                        lHeadgear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & (Q(category__id = 68) | Q(category__id = 70)))
                         if lHeadgear:
                             lHeadgeardIds = [c.id for c in lHeadgear]
                             headgear = Clothe.objects.get(id = random.choice(lHeadgearIds))
@@ -1609,7 +1609,7 @@ def generateOutfit(request):
                 # echarpe
                 cloth = {}
                 if temp<12:
-                    lScarf = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(category__id = 65))
+                    lScarf = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & Q(category__id = 65))
                     if lScarf:
                         lScarfIds = [c.id for c in lScarf]
                         scarf = Clothe.objects.get(id = random.choice(lScarfIds))
@@ -1621,7 +1621,7 @@ def generateOutfit(request):
                 #gants et mitaines
                 cloth = {}
                 if temp<=8:
-                    lGlove = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & (Q(category__id = 66) | Q(category__id = 72)))
+                    lGlove = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & (Q(category__id = 66) | Q(category__id = 72)))
                     if lGlove:
                         lGloveIds = [c.id for c in lGlove]
                         glove = Clothe.objects.get(id = random.choice(lGloveIds))
@@ -1633,7 +1633,7 @@ def generateOutfit(request):
                 #bonnet
                 cloth = {}
                 if temp<=8 and temp>-5:
-                    lBonnet = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(category__id = 67))
+                    lBonnet = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & Q(category__id = 67))
                     if lBonnet:
                         lBonnetIds = [c.id for c in lBonnet]
                         bonnet = Clothe.objects.get(id = random.choice(lBonnetIds))
@@ -1645,7 +1645,7 @@ def generateOutfit(request):
                 #cagoule
                 cloth = {}
                 if temp<=-5:
-                    lHood = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(category__id = 71))
+                    lHood = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & Q(category__id = 71))
                     if lHood:
                         lHoodIds = [c.id for c in lHood]
                         hood = Clothe.objects.get(id = random.choice(lHoodIds))
@@ -1659,7 +1659,7 @@ def generateOutfit(request):
                 if temp>=12 and temp<20:
                     flag = random.randint(0,1)
                     if flag==1:
-                        lFoulard = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & (Q(category__id = 74) | Q(category__id = 73)))
+                        lFoulard = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & (Q(category__id = 74) | Q(category__id = 73)))
                         if lFoulard:
                             lFoulardIds = [c.id for c in lFoulard]
                             foulard = Clothe.objects.get(id = random.choice(lFoulardIds))
@@ -1671,10 +1671,10 @@ def generateOutfit(request):
 
                 #noeud pap / cravate
                 cloth = {}
-                if outfitLayers == 2 and SecondLayer.id == 10:
+                if outfitLayers == 2 and SecondLayer !=-1 and SecondLayer.id == 10:
                     flag = random.randint(0,1)
                     if flag==1:
-                        lCravat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(colors__id__in = lCoulIds) & (Q(category__id = 75) | Q(category__id = 76)))
+                        lCravat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & Q(colors__id__in = lCoulIds) & (Q(category__id = 75) | Q(category__id = 76)))
                         if lCravat:
                             lCravatIds = [c.id for c in lCravat]
                             cravat = Clothe.objects.get(id = random.choice(lCravatIds))
@@ -1687,7 +1687,7 @@ def generateOutfit(request):
                 cloth = {}
                 flag = random.randint(0,1)
                 if flag==1:
-                    lBag = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(colors__id__in = lCoulIds) & (Q(category__id = 77) | Q(category__id = 78) | Q(category__id = 79)))
+                    lBag = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(colors__id__in = lCoulIds) & Q(state =0) & (Q(category__id = 77) | Q(category__id = 78) | Q(category__id = 79)))
                     if lBag:
                         lBagIds = [c.id for c in lBag]
                         bag = Clothe.objects.get(id = random.choice(lBagIds))
@@ -2015,7 +2015,7 @@ def switchClothe(request, idC, way):
 
         if flagSecond == 1:
             #on récupère tous les vêt qui sont potentiellement compatibles
-            lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__layer = 2) | Q(category__layer = 0)))
+            lSecondLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(state =0) & Q(colors__id__in = lColIds) & (Q(category__layer = 2) | Q(category__layer = 0)))
             # normalement il faudrait un & Q(id != outfit.secondLayer.id) pour qu'on ne puisse pas tomber sur le même vet que l'autre couche mais si je le met j'ai un bool object is not iterable
             lSecondLayerIds = []
             if lSecondLayer:
@@ -2049,11 +2049,11 @@ def switchClothe(request, idC, way):
         if flagFirst == 1:
             #on récupère tous les vêt qui sont potentiellement compatibles
             if outfit.nbrLayer == 2:
-                lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
+                lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(state =0) & Q(colors__id__in = lColIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
                 # normalement il faudrait un & Q(id != outfit.secondLayer.id) pour qu'on ne puisse pas tomber sur le même vet que l'autre couche mais si je le met j'ai un bool object is not iterable
             else:
                 ptsFirst = ptsTop
-                lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
+                lFirstLayer = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(state =0) & Q(colors__id__in = lColIds) & (Q(category__layer = 1) | Q(category__layer = 0)))
 
                 
             if lFirstLayer:
@@ -2089,7 +2089,7 @@ def switchClothe(request, idC, way):
         #pantalon
         if flagPant == 1:
             lPantIds = []
-            lPant = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 2) & (Q(colors__id__in = lColIds) | Q(category__id = 31)))
+            lPant = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 2) & Q(state =0) & (Q(colors__id__in = lColIds) | Q(category__id = 31)))
             
             if lPant:
                 
@@ -2121,7 +2121,7 @@ def switchClothe(request, idC, way):
         #chaussures
         if flagShoes == 1:
             if SecondLayer.id == 10: # si veste costume
-                lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 3) & (Q(category__layer = 50) | Q(category__layer = 39) | Q(category__layer = 40)) & Q(colors__id__in = lColIds))
+                lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 3) & Q(state =0) & (Q(category__layer = 50) | Q(category__layer = 39) | Q(category__layer = 40)) & Q(colors__id__in = lColIds))
                 if lShoes:
                     lShoesIds = [c.id for c in lShoes]
                     
@@ -2141,7 +2141,7 @@ def switchClothe(request, idC, way):
                     clothToReturn = -1
 
             else: # si pas veste
-                lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 3) & Q(colors__id__in = lColIds))
+                lShoes = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 3) & Q(state =0) & Q(colors__id__in = lColIds))
                 if lShoes:
                     for c in lShoes:
                         warmthTot = c.category.warmth * c.warmth
@@ -2181,7 +2181,7 @@ def switchClothe(request, idC, way):
             else:
                 lColIdsCoat = lColIds
 
-            lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(category__layer = 3) & Q(colors__id__in = lColIds))
+            lCoat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(state =0) & Q(category__layer = 3) & Q(colors__id__in = lColIds))
             
             if lCoat:
                 
@@ -2214,7 +2214,7 @@ def switchClothe(request, idC, way):
 
         #ss vêt
         if flagUnderwear == 1:    
-            lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 4) & (Q(category__id = 58) | Q(category__id = 57) | Q(category__id = 56) | Q(category__id = 55) | Q(category__id = 54) | Q(category__id = 53)))
+            lUnderwear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 58) | Q(category__id = 57) | Q(category__id = 56) | Q(category__id = 55) | Q(category__id = 54) | Q(category__id = 53)))
 
             if lUnderwear:
                 lUnderwearIds = [c.id for c in lUnderwear]
@@ -2237,7 +2237,7 @@ def switchClothe(request, idC, way):
         #ss vêt top
         if flagUnderwearTop == 1:
             
-            lUnderwearTop = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 4) & (Q(category__id = 64) | Q(category__id = 59)))
+            lUnderwearTop = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 64) | Q(category__id = 59)))
 
             if lUnderwearTop:
                 lUnderwearTopIds = [c.id for c in lUnderwearTop]
@@ -2259,7 +2259,7 @@ def switchClothe(request, idC, way):
 
         #chaussettes
         if flagSock == 1:     
-            lSocks = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 4) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
+            lSocks = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 4) & Q(state =0) & (Q(category__id = 63) | Q(category__id = 62) | Q(category__id = 61) | Q(category__id = 60)))
 
             if lSocks:
                 lSockIds = [c.id for c in lSocks]
@@ -2286,7 +2286,7 @@ def switchClothe(request, idC, way):
         #casquette
         if area == 5 and cloth.category.id == 69:
             
-            lCap = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(category__id = 69))
+            lCap = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(state =0) & Q(category__id = 69))
 
             if lCap:
                 lCapIds = [c.id for c in lCap]
@@ -2310,7 +2310,7 @@ def switchClothe(request, idC, way):
         #chapeau et beret
         if area == 5 and (cloth.category.id == 68 or cloth.category.id == 70):
             
-            lHeadgear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & (Q(category__id = 68) | Q(category__id = 70)))
+            lHeadgear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(state =0) & (Q(category__id = 68) | Q(category__id = 70)))
 
             if lHeadgear:
                 lHeadgearIds = [c.id for c in lHeadgear]
@@ -2334,7 +2334,7 @@ def switchClothe(request, idC, way):
         #echarpe
         if area == 5 and cloth.category.id == 65:
             
-            lScarf = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(category__id = 65))
+            lScarf = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(state =0) & Q(category__id = 65))
 
             if lScarf:
                 lScarfIds = [c.id for c in lScarf]
@@ -2358,7 +2358,7 @@ def switchClothe(request, idC, way):
         #gants et mitaines
         if area == 5 and (cloth.category.id == 66 or cloth.category.id == 72):
             
-            lGlove = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & (Q(category__id = 66) | Q(category__id = 72)))
+            lGlove = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(state =0) & (Q(category__id = 66) | Q(category__id = 72)))
 
             if lGlove:
                 lGloveIds = [c.id for c in lGlove]
@@ -2382,7 +2382,7 @@ def switchClothe(request, idC, way):
         #bonnet
         if area == 5 and cloth.category.id == 67:
             
-            lBonnet = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(category__id = 67))
+            lBonnet = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(state =0) & Q(category__id = 67))
 
             if lBonnet:
                 lBonnetIds = [c.id for c in lBonnet]
@@ -2406,7 +2406,7 @@ def switchClothe(request, idC, way):
         #cagoule
         if area == 5 and cloth.category.id == 71:
             
-            lHood = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(category__id = 71))
+            lHood = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(state =0) & Q(category__id = 71))
 
             if lHood:
                 lHoodIds = [c.id for c in lHood]
@@ -2430,7 +2430,7 @@ def switchClothe(request, idC, way):
         #etole foulard
         if area == 5 and (cloth.category.id == 74 or cloth.category.id == 73):
             
-            lFoulard = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & (Q(category__id = 74) | Q(category__id = 73)))
+            lFoulard = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(state =0) & (Q(category__id = 74) | Q(category__id = 73)))
 
             if lFoulard:
                 lFoulardIds = [c.id for c in lFoulard]
@@ -2455,7 +2455,7 @@ def switchClothe(request, idC, way):
         #noeud pap / cravate
         if area == 5 and (cloth.category.id == 75 or cloth.category.id == 76):
             
-            lCravat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(colors__id__in = lColIds) & (Q(category__id = 75) | Q(category__id = 76)))
+            lCravat = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 5) & Q(state =0) & Q(colors__id__in = lColIds) & (Q(category__id = 75) | Q(category__id = 76)))
 
             if lCravat:
                 lCravatIds = [c.id for c in lCravat]
@@ -2478,7 +2478,7 @@ def switchClothe(request, idC, way):
         #sac
         if area == 5 and (cloth.category.id == 77 or cloth.category.id == 78 or cloth.category.id == 79):
             
-            lBag = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(colors__id__in = lColIds) & (Q(category__id = 77) | Q(category__id = 78) | Q(category__id = 79)))
+            lBag = Clothe.objects.filter(Q(user = currentUser) & Q(themes = outfit.theme) & Q(category__area = 1) & Q(state =0) & Q(colors__id__in = lColIds) & (Q(category__id = 77) | Q(category__id = 78) | Q(category__id = 79)))
 
             if lBag:
                 lBagIds = [c.id for c in lBag]
