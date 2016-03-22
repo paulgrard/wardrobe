@@ -100,7 +100,23 @@ for x in lignes_s:
 ######################
 
 
-a=open("5Accessoires.txt",mode='r', encoding = "ISO-8859-1")
+
+s=open("5Chaussettes.txt",mode='r', encoding = "ISO-8859-1")
+lignes_s = s.readlines()
+
+
+for x in lignes_s:
+    x=x.rstrip('\n')
+    
+    newCat = Category(name = x, area = 5)
+    newCat.save()    
+    print(x)
+
+
+######################
+    
+
+a=open("6Accessoires.txt",mode='r', encoding = "ISO-8859-1")
 lignes_a = a.readlines()
 
 flag=1
@@ -116,7 +132,7 @@ for x in lignes_a:
     else:
         c=x
         flag=1
-        newCat = Category(name = n, warmth = c, area = 5)
+        newCat = Category(name = n, warmth = c, area = 6)
         newCat.save()
         n=''
         c=''
@@ -125,14 +141,14 @@ for x in lignes_a:
 
 ################
 
-ab=open("5Accessoires2.txt",mode='r', encoding = "ISO-8859-1")
+ab=open("6Accessoires2.txt",mode='r', encoding = "ISO-8859-1")
 lignes_ab = ab.readlines()
 
 
 for x in lignes_ab:
     x=x.rstrip('\n')
     
-    newCat = Category(name = x, area = 5)
+    newCat = Category(name = x, area = 6)
     newCat.save()
     
     print(x)
