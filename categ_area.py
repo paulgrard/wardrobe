@@ -101,11 +101,11 @@ for x in lignes_s:
 
 
 
-s=open("5Chaussettes.txt",mode='r', encoding = "ISO-8859-1")
-lignes_s = s.readlines()
+ch=open("5Chaussettes.txt",mode='r', encoding = "ISO-8859-1")
+lignes_ch = ch.readlines()
 
 
-for x in lignes_s:
+for x in lignes_ch:
     x=x.rstrip('\n')
     
     newCat = Category(name = x, area = 5)
