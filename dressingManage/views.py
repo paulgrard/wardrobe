@@ -1062,7 +1062,7 @@ def generateOutfit(request):
                             # crée la liste des couleurs
                             lCoul = SecondLayer.colors
                             for c in lCoul.all():
-                                quant = Quantity.objects.get(id = SecondLayer.quantities.all(), color = c)
+                                quant = Quantity.objects.get(id__in = SecondLayer.quantities.all(), color = c)
                                 '''for q in SecondLayer.quantities.all():
                                     quant = Quantity.objects.get(id = q.id, color = c)'''
                                 
@@ -1126,7 +1126,7 @@ def generateOutfit(request):
                             lCoulPant = pant.colors
 
                             for c in lCoulPant.all():
-                                quant = Quantity.objects.get(id = pant.quantities.all(), color = c)
+                                quant = Quantity.objects.get(id__in = pant.quantities.all(), color = c)
                                 if quant.quantity >= 20:
                                     lCoulIds.append(1) 
                                     lCoulIds.append(2)
@@ -1186,7 +1186,7 @@ def generateOutfit(request):
                             lCoul = FirstLayer.colors
 
                             for c in lCoul.all():
-                                quant = Quantity.objects.get(id = FirstLayer.quantities.all(), color = c)
+                                quant = Quantity.objects.get(id__in = FirstLayer.quantities.all(), color = c)
                                 if quant.quantity >= 20:
                                     
                                     lCoulIds.append(1) 
@@ -1252,7 +1252,7 @@ def generateOutfit(request):
                             # crée la liste des couleurs
                             lCoul = FirstLayer.colors
                             for c in lCoul.all():
-                                quant = Quantity.objects.get(id = FirstLayer.quantities.all(), color = c)
+                                quant = Quantity.objects.get(id__in = FirstLayer.quantities.all(), color = c)
                                 if quant.quantity >= 20:
                                     if c.id == 1 or c.id == 2: # si noir ou blanc 
                                         if len(lCoulIds) == 0: # et si liste vide on ajoute tout
@@ -1304,7 +1304,7 @@ def generateOutfit(request):
                             lCoulPant = pant.colors
 
                             for c in lCoulPant.all():
-                                quant = Quantity.objects.get(id = pant.quantities.all(), color = c)
+                                quant = Quantity.objects.get(id__in = pant.quantities.all(), color = c)
                                 if quant.quantity >= 20:
                                     lCoulIds.append(1) 
                                     lCoulIds.append(2)
@@ -1861,7 +1861,7 @@ def switchClothe(request, idC, way):
             flagSecond = 1
         elif outfit.secondLayer:
             for col in outfit.secondLayer.colors.all():
-                quant = Quantity.objects.get(id = outfit.secondLayer.quantities.all(), color = col)
+                quant = Quantity.objects.get(id__in = outfit.secondLayer.quantities.all(), color = col)
 
                 if quant.quantity >= 20:   
                     if col.id == 1 or col.id == 2: # si noir ou blanc 
@@ -1884,7 +1884,7 @@ def switchClothe(request, idC, way):
             flagFirst = 1
         elif outfit.firstLayer:
             for col in outfit.firstLayer.colors.all():
-                quant = Quantity.objects.get(id = outfit.firstLayer.quantities.all(), color = col)
+                quant = Quantity.objects.get(id__in = outfit.firstLayer.quantities.all(), color = col)
 
                 if quant.quantity >= 20:   
                     if col.id == 1 or col.id == 2: # si noir ou blanc 
@@ -1908,7 +1908,7 @@ def switchClothe(request, idC, way):
         elif outfit.pant:
             #pour gérer le switch du manteau
             for col in outfit.pant.colors.all():
-                quant = Quantity.objects.get(id = outfit.pant.quantities.all(), color = col)
+                quant = Quantity.objects.get(id__in = outfit.pant.quantities.all(), color = col)
 
                 if quant.quantity >= 20:   
                     if col.id == 1 or col.id == 2: # si noir ou blanc 
