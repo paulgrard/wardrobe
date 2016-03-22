@@ -1580,7 +1580,7 @@ def generateOutfit(request):
                 #generation des accessoires
                 cloth = {}
                 # casquette
-                if weatherDescription == "Clear" and temp>25:
+                if weather == "Clear" and temp>25:
                     lCap = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & Q(category__id = 69))
                     if lCap:
                         lCapIds = [c.id for c in lCap]
@@ -1595,7 +1595,7 @@ def generateOutfit(request):
 
                 # chapeau et beret
                 cloth = {}
-                if weatherDescription == "Clear" and temp<25 and temp >8:
+                if weather == "Clear" and temp<25 and temp >8:
                     flag = random.randint(0,1)
                     if flag==1:
                         lHeadgear = Clothe.objects.filter(Q(user = currentUser) & Q(themes = thm) & Q(category__area = 5) & Q(state =0) & (Q(category__id = 68) | Q(category__id = 70)))
@@ -1776,7 +1776,7 @@ def generateOutfit(request):
                 outfit.ptsCoat = ptsCoat
                 outfit.ptsShoes = ptsShoes
                 outfit.ptsVarious = ptsVarious
-                outfit.weather = weatherDescription
+                outfit.weather = weather
                 outfit.save()
                 
                 
