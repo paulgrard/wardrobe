@@ -808,7 +808,7 @@ def getOutfitSettings(request):
             info['underwear'] = -1
 
         
-        if outfit.underwearTop:
+        if outfit.underwearTop != None:
             temp = {}
             temp['id'] = outfit.underwearTop.id
             temp['photo'] = outfit.underwearTop.photo
@@ -925,7 +925,7 @@ def generateOutfit(request):
                 weatherDescription = content["list"][0]["weather"][0]["description"]
                 #"light rain"
                 data["weather"] = weather
-
+                
                 # récupère thèmes
                 if themesC:
                     try:
@@ -1738,6 +1738,10 @@ def generateOutfit(request):
                 if underwearTop!=-1 and param.sex == 2:
                     outfit.underwearTop = underwearTop
                     #clothesToPush.append(underwearTop)
+
+                '''if underwearTop==-1 and param.sex == 1:
+                    outfit.underwearTop = None'''
+
                     
                 if sock!=-1:
                     outfit.sock = sock
@@ -1791,7 +1795,7 @@ def generateOutfit(request):
 
             ####################
             form = OutfitGenerationForm()
-            #return render(request, 'dressingManage/generateOutfit.html', locals())
+            return render(request, 'dressingManage/generateOutfit.html', locals())
             ####################
 
             data['message'] = 'Une requête POST est nécessaire.'
