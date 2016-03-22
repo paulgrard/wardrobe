@@ -878,15 +878,17 @@ def generateOutfit(request):
         if request.method == "POST":
             form = OutfitGenerationForm(request.POST)
             if form.is_valid():
-                '''try:
+                try:
                     outfit = Outfit.objects.get(userOwner = currentUser)
+                    outfit.delete()
                 except Outfit.DoesNotExist:
-                    outfit = Outfit(userOwner = currentUser)
-                    outfit.save()'''
+                    pass
+                outfit = Outfit(userOwner = currentUser)
+                outfit.save()
                 
                 
                 
-                outfit, created = Outfit.objects.get_or_create(userOwner = currentUser)
+                #outfit, created = Outfit.objects.get_or_create(userOwner = currentUser)
                 
                 outfit.generating = True
 
